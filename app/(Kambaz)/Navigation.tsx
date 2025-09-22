@@ -9,10 +9,12 @@ export default function KambazNavigation() {
       <Link href="/Calendar" id="wd-calendar-link">Calendar</Link><br/>
       <Link href="/Inbox" id="wd-inbox-link">Inbox</Link><br/>
       <Link href="/Labs" id="wd-labs-link">Labs</Link><br/>
-      {/* Confirm if this is needed : Quiz, Piazza, grades and Zoom Pages are not implemented yet 
-      <Link href="/Quiz" id="wd-quiz-link">Quiz</Link><br/>
-      <Link href="/Piazza" id="wd-piazza-link">Piazza</Link><br/>
+      {/* Confirm if this is needed : calendar, inbox are not implemented yet 
+      
       <Link href="/Zoom" id="wd-zoom-link">Zoom</Link><br/>
       <Link href="/Grades" id="wd-grades-link">Grades</Link><br/>*/}
+
+      <Link href="/Calendar" id="wd-calendar-link">Calendar</Link><br/>
+      <Link href="/Inbox" id="wd-inbox-link">Inbox</Link><br/>
     </div>
 );}
