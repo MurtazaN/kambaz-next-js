@@ -3,7 +3,7 @@ export default function Signup() {
   return (
     <div id="wd-signup-screen">
     <h3>Sign up</h3>
-      {/* changed placeholders for regrading */}
+      {/* added default values */}
       <input defaultValue="John" placeholder="John" className="wd-username" /><br/>
       <input defaultValue={"jsdhfdsjhb"} placeholder="P@$$Waard" type="password" className="wd-password" /><br/>
       <input defaultValue={"jsdhfdsjhb"} placeholder="PA$$Waard" type="password" className="wd-password-verify" /><br/>
