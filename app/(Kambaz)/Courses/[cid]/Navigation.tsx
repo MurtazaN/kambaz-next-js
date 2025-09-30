@@ -13,5 +13,8 @@ export default function CourseNavigation() {
         </Link><br/>
       <Link href="/Courses/1234/Grades" id="wd-course-grades-link">Grades</Link><br/>
       <Link href="/Courses/1234/People/Table" id="wd-course-people-link">People</Link><br/>
+      {/* Additions for regrading */}
+      <Link href="/Courses/1234/Exams" id="wd-course-exams-link">Exams</Link><br/>
+      <Link href="/Courses/1234/Project" id="wd-course-project-link">Project</Link><br/>
     </div>
   );}
