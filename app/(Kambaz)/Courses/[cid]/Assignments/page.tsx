@@ -65,6 +65,18 @@ export default function Assignments() {
         </li>
       </ul>
 
+      <ul id="wd-project-list">
+        <li className="wd-project-list-item">
+          <Link href="/Courses/1234/Projects/123"
+             className="wd-project-link" >
+            Project - Portfolio Website
+          </Link> 
+          <div>
+            Multiple Modules | <strong>Not available until April 6 at 12:00am</strong> | <strong>Due May 27 at 11:59pm</strong> | 200 pts
+          </div>
+        </li>
+      </ul>
+
       <ul id="wd-exam-list">
         <li className="wd-exam-list-item">
           <Link href="/Courses/1234/Exams/123"
