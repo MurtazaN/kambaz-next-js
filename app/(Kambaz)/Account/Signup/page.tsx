@@ -8,10 +8,13 @@ export default function Signup() {
     <div id="wd-signup-screen">
     <h3>Sign up</h3>
       <Form.Control id="wd-username"
-             placeholder="username"
+             defaultValue="username"
              className="mb-2"/>
       <Form.Control id="wd-password"
-             placeholder="password" type="password"
+             defaultValue="password" type="password"
+             className="mb-2"/>
+      <Form.Control id="wd-verify-password"
+             defaultValue="password" type="password"
              className="mb-2"/>
       <Link id="wd-signin-btn"
             href="/Account/Profile"
