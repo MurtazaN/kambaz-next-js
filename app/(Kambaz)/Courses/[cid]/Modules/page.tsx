@@ -5,18 +5,13 @@ import ModulesControls from "./ModulesControls";
 import { BsGripVertical } from "react-icons/bs";
 import ModuleControlButtons from "./ModuleControlButtons";
 import LessonControlButtons from "./LessonControlButtons";
+import ModuleHeader from "./ModuleHeader";
 
 export default function Modules() {
   return (
     <div>
-      {/* Implement Collapse All button, View Progress button, etc. */}
 
-      {/* <div className="top-buttons">
-        <button>Collapse All</button>
-        <button>View Progress</button>
-        <button>Publish All</button>
-        <button>+ Module</button>
-      </div> */}
+      <ModuleHeader /><br />
 
       <ModulesControls /><br /><br /><br /><br />
 
