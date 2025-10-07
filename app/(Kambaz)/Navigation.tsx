@@ -16,6 +16,11 @@ export default function KambazNavigation() {
   return (
     <ListGroup className="rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2" style={{ width: 120 }}
               id="wd-kambaz-navigation">
+    {/* <ListGroup
+      className={className || "rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2"}
+      style={style || { width: 120 }}
+      id="wd-kambaz-navigation"
+    > */}
      <ListGroupItem className="bg-black border-0 text-center" as="a"
               target="_blank" href="https://www.northeastern.edu/" id="wd-neu-link">
         <img src="/images/NEU_RGB.png" width="75px" alt="Northeastern University" />
@@ -70,4 +75,4 @@ export default function KambazNavigation() {
       </ListGroupItem>
    </ListGroup>
   );
-}
+}        
