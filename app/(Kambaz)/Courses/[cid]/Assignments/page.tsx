@@ -39,7 +39,7 @@ export default function Assignments() {
                                 A1 - ENV + HTML
                             </Link>
                             <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> |
+                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Jan 15 at 12am |
                             <br />
                             <b>Due</b> Jan 22 at 11:59pm | -/100 pts
                         </Col>
