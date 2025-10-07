@@ -1,22 +1,23 @@
+import { Form } from "react-bootstrap";
 import Link from "next/link";
+
 export default function Signin() {
  return (
     
     <div id="wd-signin-screen">
       <h3>Sign in</h3>
 
-      {/* added default value*/}
-      <input defaultValue="Jason" className="wd-username" placeholder="Jason" /> <br />
-      <input defaultValue="B@ckT0Pa$$" className="wd-password" placeholder="B@ckT0Pa$$" type="password" /> <br />
+      <Form.Control id="wd-username"
+             defaultValue="Jason"
+             className="mb-2"/>
+      <Form.Control id="wd-password"
+             defaultValue="Jason" type="password"
+             className="mb-2"/>
+      <Link id="wd-signin-btn"
+            href="/Account/Profile"
+            className="btn btn-primary w-100 mb-2">
+            Sign in </Link>
+      <Link id="wd-signup-link" href="/Account/Signup">Sign up</Link>
 
-      {/*ask about error for "for" keyword in label tag*/}
-      {/*<label htmlFor="username">Your User Name:</label> <br/>
-      <input type="text" id="username" name="name" defaultValue="John Doe" /><br/>
-
-      <label htmlFor="password">Password</label> <br/>
-      <input type="password" id="password" name="password" defaultValue="P@$$Waaaard" /><br/>*/}
-
-      <Link id="wd-signin-btn" href="/Dashboard"> Sign in </Link> <br /> {/* '/' is root and then dashoard */}
-      <Link id="wd-signup-link" href="Signup"> Sign up </Link>
     </div>
 );}

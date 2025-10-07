@@ -1,116 +1,117 @@
+import { Button, Col, Form, Row } from "react-bootstrap";
+import FormGroup from "react-bootstrap/esm/Form";
+
 export default function AssignmentEditor() {
-  return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label><br /><br />
-      <input id="wd-name" value="A1 - ENV + HTML" /><br /><br />
-      <textarea id="wd-description">
-        The assignment is available online Submit a link to the landing page of
-      </textarea>
-      <br />
-      <table>
-        <tr>
-          <td align="center" valign="top">
-            <label htmlFor="wd-points">Points</label>
-          </td>
-          <td >
-            <input id="wd-points" value={100} />
-            </td>
-        </tr>
-        {/* Complete on your own */}
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assignment-group">Assignment Group</label>
-          </td>
-          <td>
-            <select id="wd-assignment-group">
-              <option>ASSIGNMENTS</option>
-              {/* Other options can be added as needed */}
-            </select>
-          </td>
-        </tr>
+    return (
+        <Form id="wd-assignments-editor">
+            <FormGroup className="mb-2">
+                <Form.Label htmlFor="wd-name" >Assignment Name</Form.Label>
+                <Form.Control id="wd-name" value="A1 - ENV + HTML" />
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-display-grade">Display Grade as</label>
-          </td>
-          <td>
-            <select id="wd-display-grade">
-              <option>Percentage</option>
-              {/* You can add more options like 'Points', 'Letter Grade', etc. */}
-            </select>
-          </td>
-        </tr>
+            <FormGroup className="mb-2">
+                <Form.Control as="textarea" id="wd-description" rows={5}>
+                    Complete all the Lab exercises and Kambaz exercises described in Chapter 1 of
+                    Developing Full Stack MERN Web Applications.
+                    Submit a link to the landing page of your Web application running on Netlify.
+                    The landing page should be the Kambaz application with a link to the Lab exercises.
+                    Lab 1 should be the landing page of the Lab exercises and should include the following:
+                    - Your full name and section
+                    - Links to each of the lab assignments
+                    - Link to the Kambaz application
+                    - Links to all relevant source code repositories
+                    The Kambaz application should include a link to navigate back to the landing page.
+                </Form.Control>
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-submission-type">Submission Type</label>
-          </td>
-          <td>
-            <select id="wd-submission-type">
-              <option>Online</option>
-              {/* More submission types can be added here */}
-            </select>
-          </td>
-        </tr>
+            <FormGroup as={Row} className="mb-2">
+                <Form.Label column sm="4" htmlFor="wd-points" className="text-sm-end">
+                    Points
+                </Form.Label>
+                <Col sm="8">
+                    <Form.Control id="wd-points" value={100} />
+                </Col>
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label>Online Entry Options</label>
-          </td>
-          <td>
-            <input type="checkbox" id="wd-text-entry" /> <label htmlFor="wd-text-entry">Text Entry</label><br />
-            <input type="checkbox" id="wd-website-url" /> <label htmlFor="wd-website-url">Website URL</label><br />
-            <input type="checkbox" id="wd-media-recordings" /> <label htmlFor="wd-media-recordings">Media Recordings</label><br />
-            <input type="checkbox" id="wd-student-annotation" /> <label htmlFor="wd-student-annotation">Student Annotation</label><br />
-            <input type="checkbox" id="wd-file-uploads" /> <label htmlFor="wd-file-uploads">File Uploads</label>
-          </td>
-        </tr>
+            <FormGroup as={Row} className="mb-2">
+                <Form.Label column sm="4" htmlFor="wd-group" className="text-sm-end">
+                    Assignment Group
+                </Form.Label>
+                <Col sm="8">
+                    <Form.Select id="wd-group" name="wd-group">
+                        <option value="ASSIGNMENTS">ASSIGNMENTS</option>
+                        <option value="QUIZZES">QUIZZES</option>
+                        <option value="EXAMS">EXAMS</option>
+                        <option value="PROJECT">PROJECT</option>
+                    </Form.Select>
+                </Col>
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign-to">Assign To</label>
-          </td>
-          <td>
-            <select id="wd-assign-to">
-              <option>Everyone</option>
-              {/* More options can be added here */}
-            </select>
-          </td>
-        </tr>
+            <FormGroup as={Row} className="mb-2">
+                <Form.Label column sm="4" htmlFor="wd-display-grade-as" className="text-sm-end">
+                    Display Grade as
+                </Form.Label>
+                <Col sm="8">
+                    <Form.Select id="wd-display-grade-as" name="wd-display-grade-as">
+                        <option value="Percentage">Percentage</option>
+                        <option value="Letter">Letter</option>
+                    </Form.Select>
+                </Col>
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-due-date">Due</label>
-          </td>
-          <td>
-            <input id="wd-due-date" type="date" value="2024-05-13" />
-          </td>
-        </tr>
+            <FormGroup as={Row} className="mb-2">
+                <Form.Label column sm="4" htmlFor="wd-submission-type" className="text-sm-end">
+                    Submission Type
+                </Form.Label>
+                <Col sm="8">
+                    <Form.Select id="wd-submission-type" name="wd-submission-type">
+                        <option value="Online">Online</option>
+                        <option value="Pen and paper">Pen and paper</option>
+                    </Form.Select>
+                    <Form.Label column sm="8">
+                        Online Entry Options
+                    </Form.Label>
+                    <Col sm="8">
+                        <Form.Check id="wd-text-entry" name="wd-online-entry-options" label="Text Entry" value="TEXT ENTRY" />
+                        <Form.Check id="wd-website-url" name="wd-online-entry-options" label="Website URL" value="WEBSITE URL" />
+                        <Form.Check id="wd-media-recordings" name="wd-online-entry-options" label="Media Recordings" value="MEDIA RECORDINGS" />
+                        <Form.Check id="wd-student-annotation" name="wd-online-entry-options" label="Student Annotation" value="STUDENT ANNOTATION" />
+                        <Form.Check id="wd-file-upload" name="wd-online-entry-options" label="File Upload" value="FILE UPLOAD" />
+                    </Col>
+                </Col>
+            </FormGroup>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-available-from">Available from</label>
-          </td>
-          <td>
-            <input id="wd-available-from" type="date" value="2024-05-06" />
-          </td>
-        </tr>
+            <FormGroup as={Row} className="mb-2">
+                <Form.Label column sm="4" className="text-sm-end">
+                    Assign
+                </Form.Label>
+                <Col sm="8">
+                    <Form.Label htmlFor="wd-assign-to" >Assign to</Form.Label>
+                    <Form.Control id="wd-assign-to" value="Everyone" />
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-until">Until</label>
-          </td>
-          <td>
-            <input id="wd-until" type="date" value="2024-05-20" />
-          </td>
-        </tr>
+                    <Form.Label htmlFor="wd-due-date" >Due</Form.Label>
+                    <Form.Control type="date" id="wd-assign-to" value="2025-01-22" />
 
-      </table>
+                    <Row className="mb-2">
+                        <Col>
+                            <Form.Label htmlFor="wd-available-from" >Available from</Form.Label>
+                            <Form.Control type="date" id="wd-available-from" value="2025-01-02" />
+                        </Col>
+                        <Col>
+                            <Form.Label htmlFor="wd-available-until" >Until</Form.Label>
+                            <Form.Control type="date" id="wd-available-until" value="2025-01-22" />
+                        </Col>
 
-      <br /><br />
-      <div style={{ textAlign: 'right' }}>
-        <button>Cancel</button>
-        <button>Save</button>
-      </div>
-    </div>
-);}
+                    </Row>
+                </Col>
+            </FormGroup>
+
+            <hr />
+
+            <div className="float-end mb-2 me-1">
+                <Button variant="secondary" className="me-2">Cancel</Button>
+                <Button variant="danger" className="me-2">Save</Button>
+            </div>
+        </Form>
+    );
+}
