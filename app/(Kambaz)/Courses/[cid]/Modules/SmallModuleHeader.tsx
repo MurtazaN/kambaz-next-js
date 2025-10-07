@@ -5,7 +5,6 @@ import { IoMenu, IoClose } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import KambazNavigation from "../../../Navigation"; //as TA/Prof
 import CourseNavigation from "../Navigation";
-
 import { Offcanvas, ListGroup, ListGroupItem } from "react-bootstrap";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";

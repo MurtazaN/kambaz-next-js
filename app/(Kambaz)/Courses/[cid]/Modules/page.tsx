@@ -5,13 +5,13 @@ import ModulesControls from "./ModulesControls";
 import { BsGripVertical } from "react-icons/bs";
 import ModuleControlButtons from "./ModuleControlButtons";
 import LessonControlButtons from "./LessonControlButtons";
-import ModuleHeader from "./ModuleHeader";
+import SmallModuleHeader from "./SmallModuleHeader";
 
 export default function Modules() {
   return (
     <div>
 
-      <ModuleHeader /><br />
+      <SmallModuleHeader /><br />
 
       <ModulesControls /><br /><br /><br /><br />
 
