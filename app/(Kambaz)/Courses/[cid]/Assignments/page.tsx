@@ -1,3 +1,7 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import * as db from "../../../Database";
 
 import { BsGripVertical } from "react-icons/bs";
 import { Col, ListGroup, ListGroupItem, Row } from "react-bootstrap";
@@ -12,6 +16,9 @@ import LessonControlButtons from "../Modules/LessonControlButtons";
 import Link from "next/link";
 
 export default function Assignments() {
+    const { cid } = useParams();
+    const assignments = db.assignments;
+
   return (
     <div id="wd-assignments">
 

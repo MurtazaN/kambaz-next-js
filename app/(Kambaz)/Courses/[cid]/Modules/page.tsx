@@ -1,4 +1,7 @@
+"use client";
 
+import { useParams } from "next/navigation";
+import * as db from "../../../Database";
 
 import { ListGroup, ListGroupItem } from "react-bootstrap";
 import ModulesControls from "./ModulesControls";
@@ -8,6 +11,9 @@ import LessonControlButtons from "./LessonControlButtons";
 import SmallModuleHeader from "./SmallModuleHeader";
 
 export default function Modules() {
+  const { cid } = useParams();
+  const modules = db.modules;
+
   return (
     <div>
 
@@ -16,6 +22,31 @@ export default function Modules() {
       <ModulesControls /><br /><br /><br /><br />
 
       <ListGroup className="rounded-0" id="wd-modules">
+
+                {modules
+                    .filter((module: any) => module.course === cid)
+                    .map((module: any) => (
+                        <ListGroup.Item className="wd-module p-0 mb-5 fs-5 border-gray">
+                            <div className="wd-title p-3 ps-2 bg-secondary">
+                                <BsGripVertical className="me-2 fs-3" />
+                                {module.name}
+                                <ModuleControlButtons />
+                            </div>
+                            <ListGroup className="wd-lessons rounded-0">
+                                {module.lessons.map((lesson: any) => (
+                                    <ListGroup.Item className="wd-lesson p-3 ps-1">
+                                        <BsGripVertical className="me-2 fs-3" />
+                                        {lesson.name}
+                                        <LessonControlButtons />
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        </ListGroup.Item>
+                    ))
+                }
+            </ListGroup>
+
+      {/* <ListGroup className="rounded-0" id="wd-modules">
                 <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
                     <div className="wd-title p-3 ps-2 bg-secondary">
                         <BsGripVertical className="me-2 fs-3" />
@@ -216,84 +247,7 @@ export default function Modules() {
                         </ListGroupItem>
                     </ListGroup>
                 </ListGroupItem>
-            </ListGroup>
-      {/* <ul id="wd-modules">
-        <li className="wd-module">
-          <div className="wd-title">Week 1</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">LEARNING OBJECTIVES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Introduction to the course</li>
-                <li className="wd-content-item">Learn what is Web Development</li>
-              </ul>
-              <ul className="wd-resources">
-                <li className="wd-resource-item">Syllabus</li>
-                <li className="wd-resource-item">Office Hours Schedule</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">HTML Basics</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">What is HTML?</li>
-                <li className="wd-content-item">Basic HTML Tags</li>
-              </ul>
-              <ul>
-                <li className="wd-content-item">Creating a Simple Webpage</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li className="wd-module">
-          <div className="wd-title">Week 2</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">CSS Basics</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">What is CSS?</li>
-                <li className="wd-content-item">Basic CSS Properties</li>
-              </ul>
-              <ul className="wd-resources">
-                <li className="wd-resource-item">CSS Cheat Sheet</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">JavaScript Basics</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">What is JavaScript?</li>
-                <li className="wd-content-item">Basic JavaScript Syntax</li>
-              </ul>
-              <ul className="wd-resources">
-                <li className="wd-resource-item">JavaScript Cheat Sheet</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li className="wd-module">
-          <div className="wd-title">Week 3</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">Building a Simple Website</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Combining HTML, CSS, and JavaScript</li>
-                <li className="wd-content-item">Deploying Your Website</li>
-              </ul>
-              <ul className="wd-resources">
-                <li className="wd-resource-item">Deployment Guide</li>
-              </ul>
-            </li>
-            <li className="wd-lesson">
-              <span className="wd-title">Final Project</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Project Requirements</li>
-                <li className="wd-content-item">Submission Guidelines</li>
-              </ul>
-              <ul className="wd-resources">
-                <li className="wd-resource-item">Project Template</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul> */}
+            </ListGroup> */}
+
     </div>
 );}
