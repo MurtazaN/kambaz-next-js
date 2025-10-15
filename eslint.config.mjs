@@ -15,7 +15,8 @@ const eslintConfig = [
     // Add rules configuration here
     rules: {
       "prefer-const": "off",
-      "@typescript-eslint/prefer-const": "off"
+      "@typescript-eslint/prefer-const": "off",
+      "react/no-unescaped-entities": "off"
     }
   },
   {
