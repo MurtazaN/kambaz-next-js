@@ -58,7 +58,7 @@ export default function Assignments() {
                                                 <GreenEdit />
                                             </Col>
                                             <Col>
-                                                <a href={`#/Kambaz/Courses/${assignment.course}/Assignments/${assignment._id}`} className="wd-assignment-link" >
+                                                <a href={`/Courses/${assignment.course}/Assignments/${assignment._id}`} className="wd-assignment-link" >
                                                     {assignment.title}
                                                 </a>
                                                 <br />
