@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import * as db from "../../../../Database";
 
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import FormGroup from "react-bootstrap/esm/Form";
 
 export default function AssignmentEditor() {
@@ -15,9 +15,12 @@ export default function AssignmentEditor() {
         <Form id="wd-assignments-editor">
 
              {assignments
-                .filter((assignment: any) => assignment._id === aid)
-                .map((assignment: any) => (
-                    <div>
+                .filter((assignment) => assignment._id === aid)
+                .map((assignment) => (
+                    <div key={assignment._id}>
+                {/* // .filter((assignment: any) => assignment._id === aid)
+                // .map((assignment: any) => (
+                //     <div> */}
                         <FormGroup className="mb-2">
                             <Form.Label htmlFor="wd-name" >Assignment Name</Form.Label>
                             <Form.Control id="wd-name" value={assignment.title} />
