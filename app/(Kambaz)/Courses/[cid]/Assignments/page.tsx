@@ -14,7 +14,7 @@ import AssignmentControls from "./AssignmentControls";
 
 import LessonControlButtons from "../Modules/LessonControlButtons";
 
-import Link from "next/link";
+//import Link from "next/link";
 
 export default function Assignments() {
     const { cid } = useParams();
@@ -46,8 +46,8 @@ export default function Assignments() {
 
             {isExpanded &&
                         assignments
-                            .filter((assignment: any) => assignment.course === cid)
-                            .map((assignment: any) => (
+                            .filter((assignment) => assignment.course === cid)
+                            .map((assignment) => (
                                 <ListGroup className="wd-lessons rounded-0" key={assignment._id}>
                                     <ListGroup.Item className="wd-lesson p-3 ps-1">
                                         <Row>
