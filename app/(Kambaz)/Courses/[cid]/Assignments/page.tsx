@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import * as db from "../../../Database";
+import { useState } from "react";
 
 import { BsGripVertical } from "react-icons/bs";
 import { Col, ListGroup, ListGroupItem, Row } from "react-bootstrap";
@@ -19,6 +20,16 @@ export default function Assignments() {
     const { cid } = useParams();
     const assignments = db.assignments;
 
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric"
+        });
+    }
+
   return (
     <div id="wd-assignments">
 
@@ -32,7 +43,47 @@ export default function Assignments() {
                 ASSIGNMENTS
                 <AssignmentControlButtons />
             </div>
-            <ListGroup className="wd-lessons rounded-0">
+
+            {isExpanded &&
+                        assignments
+                            .filter((assignment: any) => assignment.course === cid)
+                            .map((assignment: any) => (
+                                <ListGroup className="wd-lessons rounded-0" key={assignment._id}>
+                                    <ListGroup.Item className="wd-lesson p-3 ps-1">
+                                        <Row>
+                                            <Col xs="auto">
+                                                <BsGripVertical className="me-2 fs-3" />
+                                            </Col>
+                                            <Col xs="auto">
+                                                <GreenEdit />
+                                            </Col>
+                                            <Col>
+                                                <a href={`#/Kambaz/Courses/${assignment.course}/Assignments/${assignment._id}`} className="wd-assignment-link" >
+                                                    {assignment.title}
+                                                </a>
+                                                <br />
+                                                <span style={{ color: 'red' }}>Multiple Modules</span> |
+                                                {
+                                                    assignment.availableFromDate > new Date().toISOString() ?
+                                                        <span> <b>Not available until</b> {formatDate(assignment.dueDate)} at 12:00am |</span> :
+                                                        ""
+                                                }
+                                                <br />
+                                                <b>Due</b> {formatDate(assignment.dueDate)} at 11:59pm | -/{assignment.points} pts
+                                            </Col>
+                                            <Col xs="auto">
+                                                <LessonControlButtons />
+                                            </Col>
+                                        </Row>
+                                    </ListGroup.Item>
+                                </ListGroup>
+                            ))
+                    }
+
+
+
+
+            {/* <ListGroup className="wd-lessons rounded-0">
                 <ListGroupItem className="wd-lesson p-3 ps-1">
                     <Row>
                         <Col xs="auto">
@@ -124,7 +175,7 @@ export default function Assignments() {
                         </Col>
                     </Row>
                 </ListGroupItem>
-            </ListGroup>
+            </ListGroup> */}
         </ListGroupItem>
       </ListGroup>
 
@@ -146,7 +197,7 @@ export default function Assignments() {
                         </Col>
                         <Col>
                             <a href="#/Kambaz/Courses/1234/Quizzes/1" className="wd-quiz-link" >
-                                Q1 - HTML Quiz
+                                Quiz 1
                             </a>
                             <br />
                             <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
@@ -169,7 +220,7 @@ export default function Assignments() {
                         </Col>
                         <Col>
                             <a href="#/Kambaz/Courses/1234/Quizzes/2" className="wd-quiz-link" >
-                                Q2 - CSS Quiz
+                                Quiz 2
                             </a>
                             <br />
                             <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 13 at 12:00am |
@@ -204,7 +255,7 @@ export default function Assignments() {
                         </Col>
                         <Col>
                             <a href="#/Kambaz/Courses/1234/Projects/1" className="wd-project-link" >
-                                Project - Portfolio Website
+                                Project
                             </a>
                             <br />
                             <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
