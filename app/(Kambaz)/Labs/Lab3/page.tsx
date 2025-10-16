@@ -1,6 +1,7 @@
 
 
-import Add from "./Add";
+import AddPathParameters from "./add/[a]/[b]/page";
+
 import AddingAndRemovingToFromArrays from "./AddingAndRemovingToFromArrays";
 import ArrayIndexAndLength from "./ArrayIndexAndLength";
 import ArrowFunctions from "./ArrowFunctions";
@@ -69,14 +70,15 @@ export default function Lab3() {
             <DestructingImports />
             <Classes />
             <Styles />
-            <Add a={3} b={4} />
+            {/* <AddPathParameters /> */}
 
             <h4>Square of 4</h4>
             <Square>4</Square>
             <hr />
 
             <Highlight>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Temporibus, repellendus adipisci ad officiis repudiandae cum animi perspiciatis sequi harum amet culpa ab minus quo cupiditate quaerat corporis consectetur, delectus nisi.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipitratione eaque illo minus cum, saepe totam
+                vel nihil repellat nemo explicabo excepturi consectetur. Modi omnis minus sequi maiores, provident voluptates.
             </Highlight>
             <hr />
 
