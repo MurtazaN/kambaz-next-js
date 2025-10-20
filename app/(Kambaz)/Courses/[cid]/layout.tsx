@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import CourseNavigation from "./Navigation";
 import { FaAlignJustify } from "react-icons/fa";
 import { courses } from "../../Database";
+import Breadcrumb from "./Breadcrumb";
 
 
 export default async function CoursesLayout(
@@ -14,7 +15,8 @@ export default async function CoursesLayout(
 
       <h2 className="text-danger">
         <FaAlignJustify className="me-4 fs-4 mb-1" />
-          {course?.name}
+          {/* {course?.name} */}
+          <Breadcrumb course={course} />
 
         {/* Course {cid}  */}
         </h2>
