@@ -1,0 +1,12 @@
+"use client";
+
+export default function Lab4() {
+    return (
+        <div>
+            <h1>
+                Lab 4 - Murtaza
+            </h1>
+        </div>
+    );
+
+}
