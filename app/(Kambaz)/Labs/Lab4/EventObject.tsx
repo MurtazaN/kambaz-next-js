@@ -1,11 +1,18 @@
+"use client"
+
 import { useState } from "react";
 
 export default function EventObject() {
     const [event, setEvent] = useState(null);
-    const handleClick = (e: any) => {
+    // const handleClick = (e: any) => {
+    const handleClick = (e: React.MouseEvent) => {
         e.target = e.target.outerHTML;
         delete e.view;
         setEvent(e);
+        // const handleClick = (e: React.MouseEvent) => {
+        //     const { target, view, ...rest } = e;
+        //     const simplifiedEvent = { ...rest, target: (target as HTMLElement).outerHTML };
+        //     setEvent(simplifiedEvent as any);
     };
     return (
         <div>
