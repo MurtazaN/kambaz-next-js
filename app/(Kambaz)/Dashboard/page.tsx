@@ -84,7 +84,7 @@ export default function Dashboard() {
               // <Col className="wd-dashboard-course" style={{ width: "300px" }}>
               <Col key={course._id} className="wd-dashboard-course" style={{ width: "300px" }}>
                 <Card>
-                  <Link href={isEnrolled(course._id) ? (`/Kambaz/Courses/${course._id}/Home`) : ("")} className="wd-dashboard-course-link text-decoration-none text-dark" >
+                  <Link href={isEnrolled(course._id) ? (`/Courses/${course._id}/Home`) : ("")} className="wd-dashboard-course-link text-decoration-none text-dark" >
                     <Card.Img src={course.image} variant="top" width="100%" height={160} />
                     <Card.Body className="card-body">
                       <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden">{course.name}</Card.Title>
