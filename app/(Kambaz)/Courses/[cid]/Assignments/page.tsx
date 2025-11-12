@@ -3,20 +3,26 @@
 import { useParams } from "next/navigation";
 import * as db from "../../../Database";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment } from "./reducer";
 
 import { BsGripVertical } from "react-icons/bs";
-import { Col, ListGroup, ListGroupItem, Row } from "react-bootstrap";
+import { Col, ListGroup, ListGroupItem, Row, Modal, Button } from "react-bootstrap";
 import { IoIosArrowDown } from "react-icons/io";
+
+import { RootState } from "../../../store";
 
 import GreenEdit from "./GreenEdit";
 import AssignmentControlButtons from "./AssignmentControlButtons";
 import AssignmentControls from "./AssignmentControls";
 
 import LessonControlButtons from "../Modules/LessonControlButtons";
+import FacultyRoute from "@/app/(Kambaz)/Account/FacultyRoute";
+import { FaTrash } from "react-icons/fa";
 
 export default function Assignments() {
     const { cid } = useParams();
-    const assignments = db.assignments;
+    // const assignments = db.assignments;
 
     const [isExpanded, setIsExpanded] = useState(true);
 
@@ -27,6 +33,21 @@ export default function Assignments() {
             day: "numeric"
         });
     }
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const dispatch = useDispatch();
+
+    const { assignments } = useSelector((state: RootState) => state.assignmentReducer);
+
+
+    // const [show, setShow] = useState(false);
+    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
+
+    // Helper to open/close modal
+    const confirmDelete = (assignmentId: string) => setAssignmentToDelete(assignmentId);
+    const handleClose = () => setAssignmentToDelete(null);
+
+    // const handleClose = () => setShow(false);
+    // const handleShow = () => setShow(true);
 
     return (
         <div id="wd-assignments">
@@ -39,7 +60,11 @@ export default function Assignments() {
                         <BsGripVertical className="me-2 fs-3" />
                         <IoIosArrowDown />
                         ASSIGNMENTS
-                        <AssignmentControlButtons />
+
+                        <FacultyRoute>
+                            <AssignmentControlButtons />
+                        </FacultyRoute>
+
                     </div>
 
                     {isExpanded &&
@@ -69,10 +94,37 @@ export default function Assignments() {
                                                 <br />
                                                 <b>Due</b> {formatDate(assignment.dueDate)} at 11:59pm | -/{assignment.points} pts
                                             </Col>
-                                            <Col xs="auto">
-                                                <LessonControlButtons />
-                                            </Col>
+
+                                            <FacultyRoute>
+                                                <Col xs="auto">
+                                                    <FaTrash
+                                                        className="text-danger me-2 mb-1"
+                                                        onClick={() => confirmDelete(assignment._id)}
+                                                    />
+                                                    <LessonControlButtons />
+                                                </Col>
+                                            </FacultyRoute>
+
                                         </Row>
+
+                                        <Modal show={assignmentToDelete === assignment._id} onHide={handleClose}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Delete Assignment</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                Are you sure you want to remove the assignment
+                                                <b> {assignment.title}</b>?
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}> Cancel </Button>
+                                                <Button variant="danger"
+                                                    onClick={() => {
+                                                        dispatch(deleteAssignment(assignment._id));
+                                                        handleClose();
+                                                    }} > Confirm, Delete </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+
                                     </ListGroup.Item>
                                 </ListGroup>
                             ))
