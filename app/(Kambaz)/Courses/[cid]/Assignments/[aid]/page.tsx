@@ -181,7 +181,11 @@ export default function AssignmentEditor() {
 
                 <div className="float-end mb-2 me-1">
                     <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary me-2">Cancel</Link>
-                    <Button onClick={() => handleSave(assignment)} className="me-2" variant="danger">Save</Button>
+                    <Button 
+                    onClick={() => handleSave(assignment)} 
+                    className="me-2" variant="danger">
+                        Save
+                        </Button>
                 </div>
             </div>
         </Form>

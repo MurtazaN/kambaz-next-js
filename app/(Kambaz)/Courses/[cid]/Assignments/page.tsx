@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import * as db from "../../../Database";
 import { useState } from "react";
@@ -38,16 +39,11 @@ export default function Assignments() {
 
     const { assignments } = useSelector((state: RootState) => state.assignmentReducer);
 
-
-    // const [show, setShow] = useState(false);
     const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
 
     // Helper to open/close modal
     const confirmDelete = (assignmentId: string) => setAssignmentToDelete(assignmentId);
     const handleClose = () => setAssignmentToDelete(null);
-
-    // const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
 
     return (
         <div id="wd-assignments">
@@ -81,9 +77,12 @@ export default function Assignments() {
                                                 <GreenEdit />
                                             </Col>
                                             <Col>
-                                                <a href={`/Courses/${assignment.course}/Assignments/${assignment._id}`} className="wd-assignment-link" >
+                                                <Link
+                                                    href={`/Courses/${assignment.course}/Assignments/${assignment._id}`}
+                                                    className="wd-assignment-link text-decoration-none text-dark fw-bold">
+
                                                     {assignment.title}
-                                                </a>
+                                                </Link>
                                                 <br />
                                                 <span style={{ color: 'red' }}>Multiple Modules</span> |
                                                 {
