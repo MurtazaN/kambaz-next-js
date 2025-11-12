@@ -6,8 +6,6 @@ import { addNewCourse, deleteCourse, updateCourse, setCourses, enrollCourse, une
 import { RootState } from "../store";
 
 import { Row, Col, Card, Button, FormControl } from "react-bootstrap";
-import * as db from "../Database";
-import { v4 as uuidv4 } from "uuid";
 
 import FacultyRoute from "../Account/FacultyRoute";
 
@@ -19,7 +17,7 @@ export default function Dashboard() {
 
   const { courses } = useSelector((state: RootState) => state.coursesReducer);
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-  // const currentUser = db.users.find((u) => u.username === "iron_man"); //faculty
+  // const currentUser = db.users.find((u) => u.username === "iron_man"); //faculty user for testing
   const { enrollments } = useSelector((state: RootState) => state.coursesReducer);
 
   const [showEnrolled, setShowEnrolled] = useState(true);
@@ -83,14 +81,14 @@ export default function Dashboard() {
 
           {(showEnrolled ? enrolledCourses : courses)
             .map((course: any) => (
-              <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+              // <Col className="wd-dashboard-course" style={{ width: "300px" }}>
+              <Col key={course._id} className="wd-dashboard-course" style={{ width: "300px" }}>
                 <Card>
                   <Link href={isEnrolled(course._id) ? (`/Kambaz/Courses/${course._id}/Home`) : ("")} className="wd-dashboard-course-link text-decoration-none text-dark" >
                     <Card.Img src={course.image} variant="top" width="100%" height={160} />
                     <Card.Body className="card-body">
                       <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden">{course.name}</Card.Title>
                       <Card.Text className="wd-dashboard-course-description overflow-hidden" style={{ height: "100px" }}>{course.description}</Card.Text>
-                      {/* hidden={isEnrolled(course._id)? (false) : (true)} */}
                       <Button variant="primary" className="float-start mb-3" hidden={isEnrolled(course._id) ? (false) : (true)}>Go</Button>
 
                       {showEnrolled ? (
