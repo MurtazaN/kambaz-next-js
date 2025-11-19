@@ -1,4 +1,6 @@
 import EnvironmentVariables from "./EnvironmentVariables";
+import PathParameters from "./PathParameters";
+import QueryParameters from "./QueryParameters";
 
 const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 
@@ -13,6 +15,8 @@ export default function Lab5() {
                 </a>
             </div><hr />
             <EnvironmentVariables />
+            <PathParameters />
+            <QueryParameters />
         </div>
     );
 }
