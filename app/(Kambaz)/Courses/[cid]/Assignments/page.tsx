@@ -1,24 +1,29 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import * as db from "../../../Database";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment } from "./reducer";
 
 import { BsGripVertical } from "react-icons/bs";
-import { Col, ListGroup, ListGroupItem, Row } from "react-bootstrap";
+import { Col, ListGroup, ListGroupItem, Row, Modal, Button } from "react-bootstrap";
 import { IoIosArrowDown } from "react-icons/io";
+
+import { RootState } from "../../../store";
 
 import GreenEdit from "./GreenEdit";
 import AssignmentControlButtons from "./AssignmentControlButtons";
 import AssignmentControls from "./AssignmentControls";
 
 import LessonControlButtons from "../Modules/LessonControlButtons";
-
-//import Link from "next/link";
+import FacultyRoute from "@/app/(Kambaz)/Account/FacultyRoute";
+import { FaTrash } from "react-icons/fa";
 
 export default function Assignments() {
     const { cid } = useParams();
-    const assignments = db.assignments;
+    // const assignments = db.assignments;
 
     const [isExpanded, setIsExpanded] = useState(true);
 
@@ -29,22 +34,36 @@ export default function Assignments() {
             day: "numeric"
         });
     }
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const dispatch = useDispatch();
 
-  return (
-    <div id="wd-assignments">
+    const { assignments } = useSelector((state: RootState) => state.assignmentReducer);
 
-      <AssignmentControls /><br /><br /><br /><br />
+    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
 
-      <ListGroup id="wd-assignment-list" className="rounded-0">
-        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-                <BsGripVertical className="me-2 fs-3" />
-                <IoIosArrowDown />
-                ASSIGNMENTS
-                <AssignmentControlButtons />
-            </div>
+    // Helper to open/close modal
+    const confirmDelete = (assignmentId: string) => setAssignmentToDelete(assignmentId);
+    const handleClose = () => setAssignmentToDelete(null);
 
-            {isExpanded &&
+    return (
+        <div id="wd-assignments">
+
+            <AssignmentControls /><br /><br /><br /><br />
+
+            <ListGroup id="wd-assignment-list" className="rounded-0">
+                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+                    <div className="wd-title p-3 ps-2 bg-secondary">
+                        <BsGripVertical className="me-2 fs-3" />
+                        <IoIosArrowDown />
+                        ASSIGNMENTS
+
+                        <FacultyRoute>
+                            <AssignmentControlButtons />
+                        </FacultyRoute>
+
+                    </div>
+
+                    {isExpanded &&
                         assignments
                             .filter((assignment) => assignment.course === cid)
                             .map((assignment) => (
@@ -58,9 +77,12 @@ export default function Assignments() {
                                                 <GreenEdit />
                                             </Col>
                                             <Col>
-                                                <a href={`/Courses/${assignment.course}/Assignments/${assignment._id}`} className="wd-assignment-link" >
+                                                <Link
+                                                    href={`/Courses/${assignment.course}/Assignments/${assignment._id}`}
+                                                    className="wd-assignment-link text-decoration-none text-dark fw-bold">
+
                                                     {assignment.title}
-                                                </a>
+                                                </Link>
                                                 <br />
                                                 <span style={{ color: 'red' }}>Multiple Modules</span> |
                                                 {
@@ -71,264 +93,196 @@ export default function Assignments() {
                                                 <br />
                                                 <b>Due</b> {formatDate(assignment.dueDate)} at 11:59pm | -/{assignment.points} pts
                                             </Col>
-                                            <Col xs="auto">
-                                                <LessonControlButtons />
-                                            </Col>
+
+                                            <FacultyRoute>
+                                                <Col xs="auto">
+                                                    <FaTrash
+                                                        className="text-danger me-2 mb-1"
+                                                        onClick={() => confirmDelete(assignment._id)}
+                                                    />
+                                                    <LessonControlButtons />
+                                                </Col>
+                                            </FacultyRoute>
+
                                         </Row>
+
+                                        <Modal show={assignmentToDelete === assignment._id} onHide={handleClose}>
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Delete Assignment</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                Are you sure you want to remove the assignment
+                                                <b> {assignment.title}</b>?
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleClose}> Cancel </Button>
+                                                <Button variant="danger"
+                                                    onClick={() => {
+                                                        dispatch(deleteAssignment(assignment._id));
+                                                        handleClose();
+                                                    }} > Confirm, Delete </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+
                                     </ListGroup.Item>
                                 </ListGroup>
                             ))
                     }
-
-
-
-
-            {/* <ListGroup className="wd-lessons rounded-0">
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <Link href="/Courses/1234/Assignments/123" className="wd-assignment-link" >
-                                A1 - ENV + HTML
-                            </Link>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Jan 15 at 12am |
-                            <br />
-                            <b>Due</b> Jan 22 at 11:59pm | -/100 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <Link href="/Courses/1234/Assignments/123" className="wd-assignment-link" >
-                                A2 - CSS + BOOTSTRAP
-                            </Link>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Jan 17 at 12am |
-                            <br />
-                            <b>Due</b> Feb 5 at 11:59pm | -/100 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <Link href="/Courses/1234/Assignments/123" className="wd-assignment-link" >
-                                A3 - JAVASCRIPT + REACT
-                            </Link>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Jan 31 at 12am |
-                            <br />
-                            <b>Due</b> Feb 19 at 11:59pm | -/100 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <Link href="/Courses/1234/Assignments/123" className="wd-assignment-link" >
-                                A4 - NODE + MONGO.DB
-                            </Link>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Feb 14 at 12am |
-                            <br />
-                            <b>Due</b> Mar 12 at 11:59pm | -/100 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-            </ListGroup> */}
-        </ListGroupItem>
-      </ListGroup>
-
-      <ListGroup id="wd-quiz-list" className="rounded-0">
-        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-                <BsGripVertical className="me-2 fs-3" />
-                <IoIosArrowDown />
-                QUIZZES
-            </div>
-            <ListGroup className="wd-lessons rounded-0">
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <a href="#/Kambaz/Courses/1234/Quizzes/1" className="wd-quiz-link" >
-                                Quiz 1
-                            </a>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
-                            <br />
-                            <b>Due</b> May 13 at 11:59pm | -/10 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <a href="#/Kambaz/Courses/1234/Quizzes/2" className="wd-quiz-link" >
-                                Quiz 2
-                            </a>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 13 at 12:00am |
-                            <br />
-                            <b>Due</b> May 20 at 11:59pm | -/10 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
                 </ListGroupItem>
             </ListGroup>
-        </ListGroupItem>
-      </ListGroup>
 
-      <ListGroup id="wd-project-list" className="rounded-0">
-        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-                <BsGripVertical className="me-2 fs-3" />
-                <IoIosArrowDown />
-                PROJECTS
-                <AssignmentControlButtons />
-            </div>
-            <ListGroup className="wd-lessons rounded-0">
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <a href="#/Kambaz/Courses/1234/Projects/1" className="wd-project-link" >
-                                Project
-                            </a>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
-                            <br />
-                            <b>Due</b> May 27 at 11:59pm | -/200 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
+            {/* Quiz Section */}
+
+            <ListGroup id="wd-quiz-list" className="rounded-0">
+                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+                    <div className="wd-title p-3 ps-2 bg-secondary">
+                        <BsGripVertical className="me-2 fs-3" />
+                        <IoIosArrowDown />
+                        QUIZZES
+                    </div>
+                    <ListGroup className="wd-lessons rounded-0">
+                        <ListGroupItem className="wd-lesson p-3 ps-1">
+                            <Row>
+                                <Col xs="auto">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                </Col>
+                                <Col xs="auto">
+                                    <GreenEdit />
+                                </Col>
+                                <Col>
+                                    <a href="#/Kambaz/Courses/1234/Quizzes/1" className="wd-quiz-link" >
+                                        Quiz 1
+                                    </a>
+                                    <br />
+                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
+                                    <br />
+                                    <b>Due</b> May 13 at 11:59pm | -/10 pts
+                                </Col>
+                                <Col xs="auto">
+                                    <LessonControlButtons />
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+
+                        <ListGroupItem className="wd-lesson p-3 ps-1">
+                            <Row>
+                                <Col xs="auto">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                </Col>
+                                <Col xs="auto">
+                                    <GreenEdit />
+                                </Col>
+                                <Col>
+                                    <a href="#/Kambaz/Courses/1234/Quizzes/2" className="wd-quiz-link" >
+                                        Quiz 2
+                                    </a>
+                                    <br />
+                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 13 at 12:00am |
+                                    <br />
+                                    <b>Due</b> May 20 at 11:59pm | -/10 pts
+                                </Col>
+                                <Col xs="auto">
+                                    <LessonControlButtons />
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+                    </ListGroup>
                 </ListGroupItem>
             </ListGroup>
-        </ListGroupItem>
-      </ListGroup>
 
-      <ListGroup id="wd-exam-list" className="rounded-0">
-        <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary">
-                <BsGripVertical className="me-2 fs-3" />
-                <IoIosArrowDown />
-                EXAMS
-                <AssignmentControlButtons />
-            </div>
-            <ListGroup className="wd-lessons rounded-0">
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <a href="#/Kambaz/Courses/1234/Exams/1" className="wd-exam-link" >
-                                Midterm Exam
-                            </a>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Feb 15 at 12:00am |
-                            <br />
-                            <b>Due</b> Feb 28 at 11:59pm | -/100 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
-                </ListGroupItem>
-                <ListGroupItem className="wd-lesson p-3 ps-1">
-                    <Row>
-                        <Col xs="auto">
-                            <BsGripVertical className="me-2 fs-3" />
-                        </Col>
-                        <Col xs="auto">
-                            <GreenEdit />
-                        </Col>
-                        <Col>
-                            <a href="#/Kambaz/Courses/1234/Exams/2" className="wd-exam-link" >
-                                Final Exam
-                            </a>
-                            <br />
-                            <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 30 at 12:00am |
-                            <br />
-                            <b>Due</b> May 30 at 11:59pm | -/200 pts
-                        </Col>
-                        <Col xs="auto">
-                            <LessonControlButtons />
-                        </Col>
-                    </Row>
+            <ListGroup id="wd-project-list" className="rounded-0">
+                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+                    <div className="wd-title p-3 ps-2 bg-secondary">
+                        <BsGripVertical className="me-2 fs-3" />
+                        <IoIosArrowDown />
+                        PROJECTS
+                        <AssignmentControlButtons />
+                    </div>
+                    <ListGroup className="wd-lessons rounded-0">
+                        <ListGroupItem className="wd-lesson p-3 ps-1">
+                            <Row>
+                                <Col xs="auto">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                </Col>
+                                <Col xs="auto">
+                                    <GreenEdit />
+                                </Col>
+                                <Col>
+                                    <a href="#/Kambaz/Courses/1234/Projects/1" className="wd-project-link" >
+                                        Project
+                                    </a>
+                                    <br />
+                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
+                                    <br />
+                                    <b>Due</b> May 27 at 11:59pm | -/200 pts
+                                </Col>
+                                <Col xs="auto">
+                                    <LessonControlButtons />
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+                    </ListGroup>
                 </ListGroupItem>
             </ListGroup>
-        </ListGroupItem>
-      </ListGroup>
+
+            <ListGroup id="wd-exam-list" className="rounded-0">
+                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+                    <div className="wd-title p-3 ps-2 bg-secondary">
+                        <BsGripVertical className="me-2 fs-3" />
+                        <IoIosArrowDown />
+                        EXAMS
+                        <AssignmentControlButtons />
+                    </div>
+                    <ListGroup className="wd-lessons rounded-0">
+                        <ListGroupItem className="wd-lesson p-3 ps-1">
+                            <Row>
+                                <Col xs="auto">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                </Col>
+                                <Col xs="auto">
+                                    <GreenEdit />
+                                </Col>
+                                <Col>
+                                    <a href="#/Kambaz/Courses/1234/Exams/1" className="wd-exam-link" >
+                                        Midterm Exam
+                                    </a>
+                                    <br />
+                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Feb 15 at 12:00am |
+                                    <br />
+                                    <b>Due</b> Feb 28 at 11:59pm | -/100 pts
+                                </Col>
+                                <Col xs="auto">
+                                    <LessonControlButtons />
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+                        <ListGroupItem className="wd-lesson p-3 ps-1">
+                            <Row>
+                                <Col xs="auto">
+                                    <BsGripVertical className="me-2 fs-3" />
+                                </Col>
+                                <Col xs="auto">
+                                    <GreenEdit />
+                                </Col>
+                                <Col>
+                                    <a href="#/Kambaz/Courses/1234/Exams/2" className="wd-exam-link" >
+                                        Final Exam
+                                    </a>
+                                    <br />
+                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 30 at 12:00am |
+                                    <br />
+                                    <b>Due</b> May 30 at 11:59pm | -/200 pts
+                                </Col>
+                                <Col xs="auto">
+                                    <LessonControlButtons />
+                                </Col>
+                            </Row>
+                        </ListGroupItem>
+                    </ListGroup>
+                </ListGroupItem>
+            </ListGroup>
 
 
-    </div>
-);
+        </div>
+    );
 }

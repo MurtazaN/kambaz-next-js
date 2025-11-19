@@ -1,10 +1,14 @@
-import ModuleEditor from "./ModuleEditor";
-import { useState } from "react";
+
 
 import { Button, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa6";
 import { MdDoNotDisturbAlt } from "react-icons/md";
 import GreenCheckmark from "./GreenCheckmark";
+
+import ModuleEditor from "./ModuleEditor";
+
+import { useState } from "react";
+
 
 
 export default function ModulesControls(
@@ -16,7 +20,7 @@ export default function ModulesControls(
 
     return (
         <div id="wd-modules-controls" className="text-nowrap">
-            <Button variant="danger" size="lg" className="me-1 float-end" id="wd-add-module-btn">
+            <Button variant="danger" onClick={handleShow} size="lg" className="me-1 float-end" id="wd-add-module-btn">
                 <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
                 Module
             </Button>
@@ -55,7 +59,6 @@ export default function ModulesControls(
 
             <ModuleEditor show={show} handleClose={handleClose} dialogTitle="Add Module"
                 moduleName={moduleName} setModuleName={setModuleName} addModule={addModule} />
-
         </div>
     );
 }
