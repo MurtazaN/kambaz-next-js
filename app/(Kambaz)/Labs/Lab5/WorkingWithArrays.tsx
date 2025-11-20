@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FormControl } from "react-bootstrap";
-import client from "./HttpClient";
 import Link from "next/link";
 
 const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
@@ -17,26 +16,6 @@ export default function WorkingWithArrays() {
         due: "2021-09-09",
         completed: false,
     });
-
-    const [errorMessage, setErrorMessage] = useState(null);
-    const updateTodo = async (todo: any) => {
-        try {
-            await client.updateTodo(todo);
-            setTodo(todos.map((t) => (t.id === todo.id ? todo : t)));
-        } catch (error: any) {
-            setErrorMessage(error.response.data.message);
-        }
-    };
-    const deleteTodo = async (todo: any) => {
-        try {
-            await client.deleteTodo(todo);
-            const newTodos = todos.filter((t) => t.id !== todo.id);
-            setTodo(newTodos);
-        } catch (error: any) {
-            console.log(error);
-            setErrorMessage(error.response.data.message);
-        }
-    };
 
     return (
         <div id="wd-working-with-arrays">
