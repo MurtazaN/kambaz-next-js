@@ -1,288 +1,119 @@
 "use client";
-
-import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import Link from "next/link";
 import * as db from "../../../Database";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { deleteAssignment } from "./reducer";
-
-import { BsGripVertical } from "react-icons/bs";
-import { Col, ListGroup, ListGroupItem, Row, Modal, Button } from "react-bootstrap";
-import { IoIosArrowDown } from "react-icons/io";
-
-import { RootState } from "../../../store";
-
-import GreenEdit from "./GreenEdit";
-import AssignmentControlButtons from "./AssignmentControlButtons";
-import AssignmentControls from "./AssignmentControls";
-
+import { Button, ListGroup, ListGroupItem, Modal } from "react-bootstrap";
+import { BsGripVertical, BsTrash } from "react-icons/bs";
+import { IoMdArrowDropdown } from "react-icons/io";
+import { PiNotePencilBold } from "react-icons/pi";
 import LessonControlButtons from "../Modules/LessonControlButtons";
-import FacultyRoute from "@/app/(Kambaz)/Account/FacultyRoute";
-import { FaTrash } from "react-icons/fa";
+import AssignmentControls from "./AssignmentControls";
+import { useState } from "react";
+import {
+    addAssignment,
+    editAssignment,
+    updateAssignment,
+    deleteAssignment,
+} from "./reducer";
+import { FaTrash } from "react-icons/fa6";
 
 export default function Assignments() {
     const { cid } = useParams();
-    // const assignments = db.assignments;
-
-    const [isExpanded, setIsExpanded] = useState(true);
-
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric"
-        });
-    }
-    const { currentUser } = useSelector((state: any) => state.accountReducer);
     const dispatch = useDispatch();
-
-    const { assignments } = useSelector((state: RootState) => state.assignmentReducer);
-
-    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
-
-    // Helper to open/close modal
-    const confirmDelete = (assignmentId: string) => setAssignmentToDelete(assignmentId);
-    const handleClose = () => setAssignmentToDelete(null);
-
+    const [showDelete, setShowDelete] = useState(false);
+    const [assignmentToDelete, setAssignmentToDelete] = useState<any>("");
+    const { assignments } = useSelector((state: any) => state.assignmentReducer);
+    console.log(typeof (assignments));
+    const handleAskDelete = (assignment: any) => {
+        setAssignmentToDelete(assignment);
+        setShowDelete(true);
+    };
+    const handleCancelDelete = () => {
+        setShowDelete(false);
+        setAssignmentToDelete(null);
+    };
+    const handleConfirmDelete = () => {
+        if (assignmentToDelete?._id) {
+            dispatch(deleteAssignment(assignmentToDelete._id));
+        }
+        setShowDelete(false);
+        setAssignmentToDelete(null);
+    };
     return (
         <div id="wd-assignments">
-
-            <AssignmentControls /><br /><br /><br /><br />
-
-            <ListGroup id="wd-assignment-list" className="rounded-0">
-                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
+            <AssignmentControls />
+            <ListGroup className="rounded-0" id="wd-assignments">
+                <ListGroupItem className="wd-assignment p-0 mb-5 fs-5 border-gray">
                     <div className="wd-title p-3 ps-2 bg-secondary">
                         <BsGripVertical className="me-2 fs-3" />
-                        <IoIosArrowDown />
+                        <IoMdArrowDropdown />
                         ASSIGNMENTS
-
-                        <FacultyRoute>
-                            <AssignmentControlButtons />
-                        </FacultyRoute>
-
                     </div>
-
-                    {isExpanded &&
-                        assignments
-                            .filter((assignment) => assignment.course === cid)
-                            .map((assignment) => (
-                                <ListGroup className="wd-lessons rounded-0" key={assignment._id}>
-                                    <ListGroup.Item className="wd-lesson p-3 ps-1">
-                                        <Row>
-                                            <Col xs="auto">
-                                                <BsGripVertical className="me-2 fs-3" />
-                                            </Col>
-                                            <Col xs="auto">
-                                                <GreenEdit />
-                                            </Col>
-                                            <Col>
-                                                <Link
-                                                    href={`/Courses/${assignment.course}/Assignments/${assignment._id}`}
-                                                    className="wd-assignment-link text-decoration-none text-dark fw-bold">
-
-                                                    {assignment.title}
-                                                </Link>
-                                                <br />
-                                                <span style={{ color: 'red' }}>Multiple Modules</span> |
-                                                {
-                                                    assignment.availableFromDate > new Date().toISOString() ?
-                                                        <span> <b>Not available until</b> {formatDate(assignment.dueDate)} at 12:00am |</span> :
-                                                        ""
-                                                }
-                                                <br />
-                                                <b>Due</b> {formatDate(assignment.dueDate)} at 11:59pm | -/{assignment.points} pts
-                                            </Col>
-
-                                            <FacultyRoute>
-                                                <Col xs="auto">
-                                                    <FaTrash
-                                                        className="text-danger me-2 mb-1"
-                                                        onClick={() => confirmDelete(assignment._id)}
-                                                    />
-                                                    <LessonControlButtons />
-                                                </Col>
-                                            </FacultyRoute>
-
-                                        </Row>
-
-                                        <Modal show={assignmentToDelete === assignment._id} onHide={handleClose}>
-                                            <Modal.Header closeButton>
-                                                <Modal.Title>Delete Assignment</Modal.Title>
-                                            </Modal.Header>
-                                            <Modal.Body>
-                                                Are you sure you want to remove the assignment
-                                                <b> {assignment.title}</b>?
-                                            </Modal.Body>
-                                            <Modal.Footer>
-                                                <Button variant="secondary" onClick={handleClose}> Cancel </Button>
-                                                <Button variant="danger"
-                                                    onClick={() => {
-                                                        dispatch(deleteAssignment(assignment._id));
-                                                        handleClose();
-                                                    }} > Confirm, Delete </Button>
-                                            </Modal.Footer>
-                                        </Modal>
-
-                                    </ListGroup.Item>
-                                </ListGroup>
-                            ))
-                    }
-                </ListGroupItem>
-            </ListGroup>
-
-            {/* Quiz Section */}
-
-            <ListGroup id="wd-quiz-list" className="rounded-0">
-                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-                    <div className="wd-title p-3 ps-2 bg-secondary">
-                        <BsGripVertical className="me-2 fs-3" />
-                        <IoIosArrowDown />
-                        QUIZZES
-                    </div>
-                    <ListGroup className="wd-lessons rounded-0">
-                        <ListGroupItem className="wd-lesson p-3 ps-1">
-                            <Row>
-                                <Col xs="auto">
-                                    <BsGripVertical className="me-2 fs-3" />
-                                </Col>
-                                <Col xs="auto">
-                                    <GreenEdit />
-                                </Col>
-                                <Col>
-                                    <a href="#/Kambaz/Courses/1234/Quizzes/1" className="wd-quiz-link" >
-                                        Quiz 1
-                                    </a>
-                                    <br />
-                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
-                                    <br />
-                                    <b>Due</b> May 13 at 11:59pm | -/10 pts
-                                </Col>
-                                <Col xs="auto">
-                                    <LessonControlButtons />
-                                </Col>
-                            </Row>
-                        </ListGroupItem>
-
-                        <ListGroupItem className="wd-lesson p-3 ps-1">
-                            <Row>
-                                <Col xs="auto">
-                                    <BsGripVertical className="me-2 fs-3" />
-                                </Col>
-                                <Col xs="auto">
-                                    <GreenEdit />
-                                </Col>
-                                <Col>
-                                    <a href="#/Kambaz/Courses/1234/Quizzes/2" className="wd-quiz-link" >
-                                        Quiz 2
-                                    </a>
-                                    <br />
-                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 13 at 12:00am |
-                                    <br />
-                                    <b>Due</b> May 20 at 11:59pm | -/10 pts
-                                </Col>
-                                <Col xs="auto">
-                                    <LessonControlButtons />
-                                </Col>
-                            </Row>
-                        </ListGroupItem>
+                    <ListGroup id="wd-assignment-list" className="rounded-0">
+                        {assignments
+                            .filter((assignment: any) => assignment.course === cid)
+                            .map((assignment: any) => (
+                                <ListGroupItem
+                                    key={assignment._id}
+                                    className="wd-assignment-list-item p-3 ps-1 d-flex align-items-start"
+                                >
+                                    <div className="d-flex align-items-start gap-2">
+                                        <BsGripVertical className="fs-3" />
+                                        <PiNotePencilBold color="green" className="fs-3" />
+                                        <div>
+                                            <Link
+                                                href={`/Courses/${cid}/Assignments/${assignment._id}`}
+                                                className="wd-assignment-link text-decoration-none"
+                                            >
+                                                {assignment.title}
+                                            </Link>
+                                            <div>
+                                                <small className="text-muted">
+                                                    Example details | 100 pts
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="d-flex align-items-center gap-2 ms-auto">
+                                        <LessonControlButtons />
+                                        <Button
+                                            variant="link"
+                                            className="text-danger p-0"
+                                            onClick={() => handleAskDelete(assignment)}
+                                            aria-label={`Delete ${assignment.title}`}
+                                        >
+                                            <FaTrash className="fs-5" />
+                                        </Button>
+                                    </div>
+                                </ListGroupItem>
+                            ))}
                     </ListGroup>
                 </ListGroupItem>
             </ListGroup>
-
-            <ListGroup id="wd-project-list" className="rounded-0">
-                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-                    <div className="wd-title p-3 ps-2 bg-secondary">
-                        <BsGripVertical className="me-2 fs-3" />
-                        <IoIosArrowDown />
-                        PROJECTS
-                        <AssignmentControlButtons />
-                    </div>
-                    <ListGroup className="wd-lessons rounded-0">
-                        <ListGroupItem className="wd-lesson p-3 ps-1">
-                            <Row>
-                                <Col xs="auto">
-                                    <BsGripVertical className="me-2 fs-3" />
-                                </Col>
-                                <Col xs="auto">
-                                    <GreenEdit />
-                                </Col>
-                                <Col>
-                                    <a href="#/Kambaz/Courses/1234/Projects/1" className="wd-project-link" >
-                                        Project
-                                    </a>
-                                    <br />
-                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 6 at 12:00am |
-                                    <br />
-                                    <b>Due</b> May 27 at 11:59pm | -/200 pts
-                                </Col>
-                                <Col xs="auto">
-                                    <LessonControlButtons />
-                                </Col>
-                            </Row>
-                        </ListGroupItem>
-                    </ListGroup>
-                </ListGroupItem>
-            </ListGroup>
-
-            <ListGroup id="wd-exam-list" className="rounded-0">
-                <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-                    <div className="wd-title p-3 ps-2 bg-secondary">
-                        <BsGripVertical className="me-2 fs-3" />
-                        <IoIosArrowDown />
-                        EXAMS
-                        <AssignmentControlButtons />
-                    </div>
-                    <ListGroup className="wd-lessons rounded-0">
-                        <ListGroupItem className="wd-lesson p-3 ps-1">
-                            <Row>
-                                <Col xs="auto">
-                                    <BsGripVertical className="me-2 fs-3" />
-                                </Col>
-                                <Col xs="auto">
-                                    <GreenEdit />
-                                </Col>
-                                <Col>
-                                    <a href="#/Kambaz/Courses/1234/Exams/1" className="wd-exam-link" >
-                                        Midterm Exam
-                                    </a>
-                                    <br />
-                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> Feb 15 at 12:00am |
-                                    <br />
-                                    <b>Due</b> Feb 28 at 11:59pm | -/100 pts
-                                </Col>
-                                <Col xs="auto">
-                                    <LessonControlButtons />
-                                </Col>
-                            </Row>
-                        </ListGroupItem>
-                        <ListGroupItem className="wd-lesson p-3 ps-1">
-                            <Row>
-                                <Col xs="auto">
-                                    <BsGripVertical className="me-2 fs-3" />
-                                </Col>
-                                <Col xs="auto">
-                                    <GreenEdit />
-                                </Col>
-                                <Col>
-                                    <a href="#/Kambaz/Courses/1234/Exams/2" className="wd-exam-link" >
-                                        Final Exam
-                                    </a>
-                                    <br />
-                                    <span style={{ color: 'red' }}>Multiple Modules</span> | <b>Not available until</b> May 30 at 12:00am |
-                                    <br />
-                                    <b>Due</b> May 30 at 11:59pm | -/200 pts
-                                </Col>
-                                <Col xs="auto">
-                                    <LessonControlButtons />
-                                </Col>
-                            </Row>
-                        </ListGroupItem>
-                    </ListGroup>
-                </ListGroupItem>
-            </ListGroup>
-
-
+            <Modal show={showDelete} onHide={handleCancelDelete} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete assignment</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {assignmentToDelete ? (
+                        <>
+                            Are you sure you want to delete{" "}
+                            <strong>{assignmentToDelete.title}</strong>?
+                        </>
+                    ) : (
+                        "Are you sure you want to delete this assignment?"
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCancelDelete}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleConfirmDelete}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }
