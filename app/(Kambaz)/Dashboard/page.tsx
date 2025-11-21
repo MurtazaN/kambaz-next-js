@@ -71,6 +71,7 @@ export default function Dashboard() {
     fetchCourses();
   }, [currentUser, showAllCourses]);
   const isFaculty = (currentUser as any)?.role === "FACULTY";
+  console.log("user", currentUser);
   const isEnrolled = (courseId: string) =>
     enrollments.some(
       (en: any) => en.user === (currentUser as any)?._id && en.course === courseId
