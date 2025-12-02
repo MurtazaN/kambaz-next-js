@@ -4,13 +4,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Nav, NavItem, NavLink } from "react-bootstrap";
-
 import { useSelector } from "react-redux";
 import { RootState } from "../store"
 
 export default function AccountNavigation() {
 
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+  console.log("currentUser:", currentUser);
   const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
   const pathname = usePathname();
 
@@ -19,28 +19,19 @@ export default function AccountNavigation() {
       {links.map((link) => (
         <NavItem key={link}>
           <NavLink as={Link} href={link} active={pathname.endsWith(link.toLowerCase())}>
-            {link} </NavLink> </NavItem>
+            {link}
+          </NavLink>
+        </NavItem>
       ))}
+
+      {currentUser && currentUser.role === "FACULTY" && (
+        <NavItem>
+          <NavLink as={Link} href="Users" active={pathname.endsWith('Users')}>
+            Users
+          </NavLink>
+        </NavItem>
+      )}
+
     </Nav>
   );
-
-
-  // return (
-  //   <div id="wd-account-navigation" className="wd list-group fs-5 rounded-0">
-  //     <Link href="/Account/Signin"
-  //       className={`list-group-item ${pathname === '/Account/Signin' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       SignIn
-  //     </Link>
-
-  //     <Link href="/Account/Signup"
-  //       className={`list-group-item ${pathname === '/Account/Signup' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       SignUp
-  //     </Link>
-
-  //     <Link href="/Account/Profile"
-  //       className={`list-group-item ${pathname === '/Account/Profile' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       Profile
-  //     </Link>
-  //   </div>
-  // );
 }
