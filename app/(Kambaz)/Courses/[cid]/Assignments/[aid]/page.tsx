@@ -24,7 +24,7 @@ export default function AssignmentEditor() {
     const { currentUser } = useSelector((state: any) => state.accountReducer);
     const isFaculty = currentUser?.role === "FACULTY";
     const existing = useMemo(
-        () => (aid !== "new" ? assignments.find((a: any) => a._id === aid) : null),
+        () => (aid !== "New" ? assignments.find((a: any) => a._id === aid) : null),
         [aid, assignments]
     );
 
@@ -37,7 +37,7 @@ export default function AssignmentEditor() {
         availableUntil: existing?.availableUntil ?? "2024-05-20",
         course: cid,
     });
-    if (aid !== "new" && !existing) {
+    if (aid !== "New" && !existing) {
         return <div className="p-4 text-danger">Assignment not found.</div>;
     }
     const handleCancel = () => {
@@ -45,7 +45,7 @@ export default function AssignmentEditor() {
     };
     const handleSave = async () => {
         try {
-            if (aid === "new") {
+            if (aid === "New") {
                 const created = await client.createAssignment(String(cid), {
                     title: assignment.title,
                 });

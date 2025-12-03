@@ -24,23 +24,4 @@ export default function AccountNavigation() {
     </Nav>
   );
 
-
-  // return (
-  //   <div id="wd-account-navigation" className="wd list-group fs-5 rounded-0">
-  //     <Link href="/Account/Signin"
-  //       className={`list-group-item ${pathname === '/Account/Signin' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       SignIn
-  //     </Link>
-
-  //     <Link href="/Account/Signup"
-  //       className={`list-group-item ${pathname === '/Account/Signup' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       SignUp
-  //     </Link>
-
-  //     <Link href="/Account/Profile"
-  //       className={`list-group-item ${pathname === '/Account/Profile' ? "active border border-0" : "text-danger border border-0"}`}>
-  //       Profile
-  //     </Link>
-  //   </div>
-  // );
 }
