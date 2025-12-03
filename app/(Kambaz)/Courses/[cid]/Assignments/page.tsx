@@ -3,18 +3,20 @@ import { useParams } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import * as db from "../../../Database";
+import * as client from "./client";
 import { Button, ListGroup, ListGroupItem, Modal } from "react-bootstrap";
 import { BsGripVertical, BsTrash } from "react-icons/bs";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { PiNotePencilBold } from "react-icons/pi";
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import AssignmentControls from "./AssignmentControls";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     addAssignment,
     editAssignment,
     updateAssignment,
     deleteAssignment,
+    setAssignments,
 } from "./reducer";
 import { FaTrash } from "react-icons/fa6";
 
@@ -25,6 +27,20 @@ export default function Assignments() {
     const [assignmentToDelete, setAssignmentToDelete] = useState<any>("");
     const { assignments } = useSelector((state: any) => state.assignmentReducer);
     console.log(typeof (assignments));
+
+    const fetchAssignments = async () => {
+        try {
+            const data = await client.findAssignmentsForCourse(cid as string);
+            dispatch(setAssignments(data));
+        } catch (err) {
+            console.error("Error fetching assignments:", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchAssignments();
+    }, [cid]);
+
     const handleAskDelete = (assignment: any) => {
         setAssignmentToDelete(assignment);
         setShowDelete(true);
@@ -33,9 +49,14 @@ export default function Assignments() {
         setShowDelete(false);
         setAssignmentToDelete(null);
     };
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (assignmentToDelete?._id) {
-            dispatch(deleteAssignment(assignmentToDelete._id));
+            try {
+                await client.deleteAssignment(assignmentToDelete._id);
+                dispatch(deleteAssignment(assignmentToDelete._id));
+            } catch (err) {
+                console.error("Error deleting assignment:", err);
+            }
         }
         setShowDelete(false);
         setAssignmentToDelete(null);
