@@ -73,7 +73,6 @@ export default function Assignments() {
                     </div>
                     <ListGroup id="wd-assignment-list" className="rounded-0">
                         {assignments
-                            .filter((assignment: any) => assignment.course === cid)
                             .map((assignment: any) => (
                                 <ListGroupItem
                                     key={assignment._id}
@@ -91,7 +90,8 @@ export default function Assignments() {
                                             </Link>
                                             <div>
                                                 <small className="text-muted">
-                                                    Example details | 100 pts
+                                                    {assignment.dueDate && `Due ${new Date(assignment.dueDate).toLocaleDateString()}`}
+                                                    {assignment.points && ` | ${assignment.points} pts`}
                                                 </small>
                                             </div>
                                         </div>

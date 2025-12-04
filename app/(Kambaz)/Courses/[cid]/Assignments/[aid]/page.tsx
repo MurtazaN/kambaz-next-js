@@ -46,15 +46,12 @@ export default function AssignmentEditor() {
     const handleSave = async () => {
         try {
             if (aid === "New") {
-                const created = await client.createAssignment(String(cid), {
-                    title: assignment.title,
-                });
+                const created = await client.createAssignment(String(cid), assignment);
                 dispatch(setAssignments([...assignments, created]));
             } else {
                 const updated = await client.updateAssignment({
+                    ...assignment,
                     _id: existing!._id,
-                    title: assignment.title,
-                    course: cid,
                 });
                 dispatch(
                     setAssignments(

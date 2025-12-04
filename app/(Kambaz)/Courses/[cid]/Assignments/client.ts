@@ -13,20 +13,20 @@ export const findAssignmentById = async (assignmentId: string) => {
     return data;
 };
 export const createAssignment = async (courseId: string, assignment: any) => {
-    const { data } = await axios.post(
+    const { data } = await axiosWithCreds.post(
         `${COURSES_API}/${courseId}/assignments`,
         assignment
     );
     return data;
 };
 export const updateAssignment = async (assignment: any) => {
-    const { data } = await axios.put(
+    const { data } = await axiosWithCreds.put(
         `${ASSIGNMENTS_API}/${assignment._id}`,
         assignment
     );
     return data;
 };
 export const deleteAssignment = async (assignmentId: string) => {
-    const { data } = await axios.delete(`${ASSIGNMENTS_API}/${assignmentId}`);
+    const { data } = await axiosWithCreds.delete(`${ASSIGNMENTS_API}/${assignmentId}`);
     return data;
 };
