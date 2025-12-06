@@ -50,6 +50,11 @@ const quizzesSlice = createSlice({
                 q._id === quizId ? { ...q, published: true } : q
             ) as any;
         },
+        unpublishQuiz: (state, { payload: quizId }) => {
+            state.quizzes = state.quizzes.map((q: any) =>
+                q._id === quizId ? { ...q, published: false } : q
+            ) as any;
+        },
         setQuestions: (state, { payload: questions }) => {
             state.questions = questions;
         },
@@ -59,7 +64,7 @@ const quizzesSlice = createSlice({
                 quiz: question.quiz,
                 title: question.title,
                 question: question.question,
-                type: question.quizType,
+                type: question.type,
                 points: question.points,
                 possibleAnswers: question.possibleAnswers,
                 correctAnswer: question.correctAnswer,
@@ -87,6 +92,8 @@ export const {
     addQuiz,
     deleteQuiz,
     updateQuiz,
+    publishQuiz,
+    unpublishQuiz,
     setQuestions,
     addQuestion,
     updateQuestion,

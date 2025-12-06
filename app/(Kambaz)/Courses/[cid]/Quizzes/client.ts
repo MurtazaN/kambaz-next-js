@@ -10,6 +10,11 @@ export const findQuizById = async (id: String) => {
     return data;
 };
 
+export const findQuizzesForCourse = async (courseId: string) => {
+    const response = await axiosWithCredentials.get(`${QUIZZES_API}/course/${courseId}`);
+    return response.data;
+};
+
 export const createQuiz = async (courseId: string, quiz: any) => {
     const response = await axiosWithCredentials.post(
         `${QUIZZES_API}/course/${courseId}`, quiz
@@ -38,6 +43,13 @@ export const publishQuiz = async (quizId: string) => {
     );
     return response.data;
 };
+
+export const unpublishQuiz = async (quizId: string) => {
+    const response = await axiosWithCredentials.post(
+        `${QUIZZES_API}/${quizId}/unpublish`
+    );
+    return response.data;
+}
 
 export const findQuestionsForQuiz = async (quizId: string) => {
     const response = await axiosWithCredentials.get(`${QUIZZES_API}/${quizId}/questions`);
