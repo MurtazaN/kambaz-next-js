@@ -5,9 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import * as quizClient from "../../client";
 import { addQuiz, updateQuiz } from "../../reducer";
-import ReactQuill from "react-quill";
-import { useRef } from "react";
-import 'react-quill/dist/quill.snow.css';
 
 export default function DetailsEditor({ quiz, setQuiz }: {
     quiz: any;
@@ -18,11 +15,14 @@ export default function DetailsEditor({ quiz, setQuiz }: {
     const dispatch = useDispatch();
     const pathname = usePathname();
     const router = useRouter();
-    const quillRef = useRef(null);
 
     const createQuizForCourse = async (quiz: any) => {
         if (!cid) return;
-        const newQuiz = await quizClient.createQuiz(cid, quiz);
+        const quizWithId = {
+            ...quiz,
+            _id: `Q${Date.now()}`
+        };
+        const newQuiz = await quizClient.createQuiz(cid, quizWithId);
         dispatch(addQuiz(newQuiz));
     };
 
@@ -31,18 +31,18 @@ export default function DetailsEditor({ quiz, setQuiz }: {
         dispatch(updateQuiz(quiz));
     };
 
-    const handleSave = (quiz: any) => {
+    const handleSave = async (quiz: any) => {
         if (pathname.includes("New")) {
-            createQuizForCourse(quiz);
+            await createQuizForCourse(quiz);
         }
         else {
-            saveQuiz(quiz);
+            await saveQuiz(quiz);
         }
         router.push(`/Courses/${cid}/Quizzes`);
     }
 
-    const handleDescriptionChange = (desc: String) => {
-        setQuiz((prevState: any) => ({ ...prevState, description: desc }));
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setQuiz((prevState: any) => ({ ...prevState, description: e.target.value }));
     }
 
     const handleCheckboxChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,8 +65,13 @@ export default function DetailsEditor({ quiz, setQuiz }: {
 
                 <FormGroup className="mb-4">
                     <FormLabel htmlFor="wd-quiz-description">Quiz Instructions:</FormLabel>
-                    <ReactQuill theme="snow" id="wd-quiz-description" value={quiz?.description}
-                        onChange={handleDescriptionChange} ref={quillRef} />
+                    <FormControl
+                        as="textarea"
+                        rows={5}
+                        id="wd-quiz-description"
+                        value={quiz?.description}
+                        onChange={handleDescriptionChange}
+                    />
                 </FormGroup>
 
                 <FormGroup as={Row} className="mb-2">
@@ -75,13 +80,13 @@ export default function DetailsEditor({ quiz, setQuiz }: {
                     </FormLabel>
                     <Col sm="4">
                         <FormSelect id="wd-quiz-type" name="wd-quiz-type"
-                            defaultValue={quiz?.quizType}
+                            value={quiz?.quizType}
                             onChange={(e) => setQuiz((prevState: any) => ({ ...prevState, quizType: e.target.value }))}
                         >
-                            <option value="GRADED_QUIZ">Graded Quiz</option>
-                            <option value="PRACTICE_QUIZ">Practice Quiz</option>
-                            <option value="GRADED_SURVEY">Graded Survey</option>
-                            <option value="UNGRADED_SURVEY">Ungraded Survey</option>
+                            <option value="Graded Quiz">Graded Quiz</option>
+                            <option value="Practice Quiz">Practice Quiz</option>
+                            <option value="Graded Survey">Graded Survey</option>
+                            <option value="Ungraded Survey">Ungraded Survey</option>
                         </FormSelect>
                     </Col>
                 </FormGroup>
@@ -92,13 +97,13 @@ export default function DetailsEditor({ quiz, setQuiz }: {
                     </FormLabel>
                     <Col sm="4">
                         <FormSelect id="wd-group" name="wd-group"
-                            defaultValue={quiz?.assignmentGroup}
-                            onChange={(e) => setQuiz((prevState: any) => ({ ...prevState, group: e.target.value }))}
+                            value={quiz?.assignmentGroup}
+                            onChange={(e) => setQuiz((prevState: any) => ({ ...prevState, assignmentGroup: e.target.value }))}
                         >
-                            <option value="quizzes">QUIZZES</option>
-                            <option value="assignments">ASSIGNMENTS</option>
-                            <option value="exams">EXAMS</option>
-                            <option value="project">PROJECT</option>
+                            <option value="Quizzes">Quizzes</option>
+                            <option value="Exams">Exams</option>
+                            <option value="Assignments">Assignments</option>
+                            <option value="Project">Project</option>
                         </FormSelect>
                     </Col>
                 </FormGroup>
@@ -114,13 +119,18 @@ export default function DetailsEditor({ quiz, setQuiz }: {
                             checked={quiz.shuffleAnswers}
                             onChange={handleCheckboxChange("shuffleAnswers")}
                         />
-                        <FormCheck
-                            className="mb-2"
-                            id="wd-time-limit"
-                            label="Time Limit"
-                            checked={quiz.timeLimit}
-                            onChange={handleCheckboxChange("timeLimit")}
-                        />
+                        <div className="d-flex align-items-center gap-2 mb-3">
+                            <FormLabel className="mb-0">
+                                Time Limit (minutes)
+                            </FormLabel>
+                            <FormControl
+                                value={quiz?.timeLimit || 0}
+                                onChange={(e) => setQuiz((prevState: any) => ({ ...prevState, timeLimit: parseInt(e.target.value) || 0 }))}
+                                className="w-25"
+                                type="number"
+                                min="0"
+                            />
+                        </div>
                         <FormCheck
                             className="mb-2"
                             id="wd-multiple-attempts"

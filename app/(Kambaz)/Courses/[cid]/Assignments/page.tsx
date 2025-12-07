@@ -26,7 +26,6 @@ export default function Assignments() {
     const [showDelete, setShowDelete] = useState(false);
     const [assignmentToDelete, setAssignmentToDelete] = useState<any>("");
     const { assignments } = useSelector((state: any) => state.assignmentReducer);
-    console.log(typeof (assignments));
 
     const fetchAssignments = async () => {
         try {

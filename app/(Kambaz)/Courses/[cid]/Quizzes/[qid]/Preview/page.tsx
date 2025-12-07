@@ -16,38 +16,32 @@ export default function QuizPreview() {
     const router = useRouter();
     const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-    const [quiz, setQuiz] = useState<any>({});
+    const [quiz, setQuiz] = useState<any>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const { quizzes } = useSelector((state: any) => state.quizzesReducer);
     const { questions } = useSelector((state: any) => state.quizzesReducer);
 
-    useEffect(() => {
-        setQuiz(quizzes.find((quiz: any) => quiz._id === qid));
-    }, [qid, quizzes]);
+    const fetchQuizAndQuestions = async () => {
+        try {
+            const quizData = await quizClient.findQuizById(qid as string);
+            setQuiz(quizData);
 
-    const fetchQuestions = async () => {
-        const questions = await quizClient.findQuestionsForQuiz(qid as string);
-        dispatch(setQuestions(questions));
+            const questionsData = await quizClient.findQuestionsForQuiz(qid as string);
+            dispatch(setQuestions(questionsData));
+        } catch (error) {
+            console.error("Error fetching quiz data:", error);
+        }
     };
 
     useEffect(() => {
-        fetchQuestions();
+        fetchQuizAndQuestions();
     }, [qid]);
 
     const [answers, setAnswers] = useState<{ [questionId: string]: string }>({});
-    const [newAnswer, setNewAnswer] = useState<string>('');
 
     const handleAnswerChange = (questionId: string, answer: string) => {
         setAnswers((prev) => ({
             ...prev,
             [questionId]: answer,
-        }));
-    };
-
-    const handleFITBChange = (questionId: string) => {
-        setAnswers((prev) => ({
-            ...prev,
-            [questionId]: newAnswer,
         }));
     };
 
@@ -66,14 +60,26 @@ export default function QuizPreview() {
 
         questions.forEach((question: any) => {
             const userAnswer = answers[question._id];
-            const correctAnswer = question.correctAnswer;
 
-            if (question.type === "FITB") {
-                if (question.possibleAnswers.includes(userAnswer)) {
+            if (question.type === "Fill in the Blank") {
+                // Check if user answer matches any possible answer
+                const isCorrect = question.possibleAnswers?.some((ans: any) =>
+                    ans.caseSensitive
+                        ? ans.text === userAnswer
+                        : ans.text.toLowerCase() === userAnswer?.toLowerCase()
+                );
+                if (isCorrect) {
                     calculatedScore += question.points;
                 }
-            } else {
-                if (userAnswer === correctAnswer) {
+            } else if (question.type === "Multiple Choice") {
+                // Find the correct choice
+                const correctChoice = question.choices?.find((choice: any) => choice.isCorrect);
+                if (correctChoice && userAnswer === correctChoice.text) {
+                    calculatedScore += question.points;
+                }
+            } else if (question.type === "True/False") {
+                // Compare with correctAnswer (boolean stored as string)
+                if (userAnswer === String(question.correctAnswer)) {
                     calculatedScore += question.points;
                 }
             }
@@ -105,14 +111,28 @@ export default function QuizPreview() {
 
     const isCorrect = (question: any) => {
         const userAnswer = answers[question._id];
-        if (question.type === "FITB") {
-            return question.possibleAnswers.includes(userAnswer);
+
+        if (question.type === "Fill in the Blank") {
+            return question.possibleAnswers?.some((ans: any) =>
+                ans.caseSensitive
+                    ? ans.text === userAnswer
+                    : ans.text.toLowerCase() === userAnswer?.toLowerCase()
+            );
+        } else if (question.type === "Multiple Choice") {
+            const correctChoice = question.choices?.find((choice: any) => choice.isCorrect);
+            return correctChoice && userAnswer === correctChoice.text;
+        } else if (question.type === "True/False") {
+            return userAnswer === String(question.correctAnswer);
         }
-        return userAnswer === question.correctAnswer;
+        return false;
     };
 
     function createMarkup(html: any) {
         return { __html: DOMPurify.sanitize(html) };
+    }
+
+    if (!quiz || !quiz.title) {
+        return <div className="ms-3 mt-3">Loading quiz...</div>;
     }
 
     return (
@@ -145,9 +165,9 @@ export default function QuizPreview() {
 
                                 <hr />
 
-                                {(currentQuestion.type === "MCQ" || currentQuestion.type === "TF") && (
-                                    currentQuestion.possibleAnswers.map((option: any, index: number) => (
-                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                {currentQuestion.type === "Multiple Choice" && currentQuestion.choices && (
+                                    currentQuestion.choices.map((choice: any, index: number) => (
+                                        <ListGroup key={index} className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
                                             <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
                                                 <div className="form-check">
                                                     <input
@@ -155,12 +175,12 @@ export default function QuizPreview() {
                                                         type="radio"
                                                         name={`question-${currentQuestion._id}`}
                                                         id={`option-${index}`}
-                                                        value={option}
-                                                        checked={answers[currentQuestion._id] === option}
-                                                        onChange={() => handleAnswerChange(currentQuestion._id, option)}
+                                                        value={choice.text}
+                                                        checked={answers[currentQuestion._id] === choice.text}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, choice.text)}
                                                     />
                                                     <label className="form-check-label" htmlFor={`option-${index}`}>
-                                                        {option}
+                                                        {choice.text}
                                                     </label>
                                                 </div>
                                             </ListGroup.Item>
@@ -168,16 +188,54 @@ export default function QuizPreview() {
                                     ))
                                 )}
 
-                                {currentQuestion.type === "FITB" && (
+                                {currentQuestion.type === "True/False" && (
+                                    <>
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${currentQuestion._id}`}
+                                                        id={`option-true`}
+                                                        value="true"
+                                                        checked={answers[currentQuestion._id] === "true"}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, "true")}
+                                                    />
+                                                    <label className="form-check-label" htmlFor={`option-true`}>
+                                                        True
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${currentQuestion._id}`}
+                                                        id={`option-false`}
+                                                        value="false"
+                                                        checked={answers[currentQuestion._id] === "false"}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, "false")}
+                                                    />
+                                                    <label className="form-check-label" htmlFor={`option-false`}>
+                                                        False
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                    </>
+                                )}
+
+                                {currentQuestion.type === "Fill in the Blank" && (
                                     <div className="d-flex gap-2 mt-3 mb-3">
                                         <FormControl
                                             placeholder="Enter answer"
-                                            value={newAnswer}
-                                            onChange={(e) => setNewAnswer(e.target.value)}
+                                            value={answers[currentQuestion._id] || ''}
+                                            onChange={(e) => handleAnswerChange(currentQuestion._id, e.target.value)}
                                         />
-                                        <Button onClick={() => handleFITBChange(currentQuestion._id)} variant="secondary">
-                                            Submit
-                                        </Button>
                                     </div>
                                 )}
 

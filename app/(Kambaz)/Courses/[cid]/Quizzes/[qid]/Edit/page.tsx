@@ -1,30 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Tab, Tabs } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { usePathname, useParams } from "next/navigation";
-import DetailsEditor from "./Details/editor";
-import QuestionsEditor from "./Questions/questionEditor";
+import DetailsEditor from "../Details/editor";
+import QuestionsEditor from "../Questions/questionEditor";
+import * as quizClient from "../../client";
 
 export default function QuizEditor() {
     const pathname = usePathname();
     const params = useParams();
+    const dispatch = useDispatch();
     const cid = Array.isArray(params.cid) ? params.cid[0] : params.cid;
     const qid = Array.isArray(params.qid) ? params.qid[0] : params.qid;
 
     const newQuiz = {
         title: "New Quiz",
         description: "New description",
-        course: cid,
+        courseCode: cid,
         points: 0,
-        assignmentGroup: "quizzes",
-        shuffleAnswers: false,
-        timeLimit: false,
+        quizType: "Graded Quiz",
+        assignmentGroup: "Quizzes",
+        shuffleAnswers: true,
+        timeLimit: 20,
         multipleAttempts: false,
-        howManyAttempts: 1,
-        showCorrectAnswers: "no",
+        showCorrectAnswers: "",
         accessCode: "",
-        oneQuestionAtATime: false,
+        oneQuestionAtATime: true,
         webcamRequired: false,
         lockQuestionsAfterAnswering: false,
         dueDate: "",
@@ -33,16 +35,31 @@ export default function QuizEditor() {
         published: false,
     }
 
-    const [quiz, setQuiz] = useState<any>({});
+    const [quiz, setQuiz] = useState<any>(newQuiz);
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
 
     useEffect(() => {
-        setQuiz(
-            pathname.includes("New")
-                ? newQuiz
-                : quizzes.find((quiz: any) => quiz._id === qid)
-        );
-    }, []);
+        const loadQuiz = async () => {
+            if (pathname.includes("New")) {
+                setQuiz(newQuiz);
+            } else {
+                // First try to get from Redux store
+                const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
+                if (foundQuiz) {
+                    setQuiz(foundQuiz);
+                } else {
+                    // If not in Redux, fetch from server
+                    try {
+                        const fetchedQuiz = await quizClient.findQuizById(qid as string);
+                        setQuiz(fetchedQuiz);
+                    } catch (error) {
+                        console.error("Error fetching quiz:", error);
+                    }
+                }
+            }
+        };
+        loadQuiz();
+    }, [qid, quizzes, pathname]);
 
     return (
         <div>
