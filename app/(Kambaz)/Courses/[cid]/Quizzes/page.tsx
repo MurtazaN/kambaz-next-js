@@ -16,7 +16,8 @@ import * as coursesClient from "../../client";
 import * as quizClient from "./client";
 
 export default function Quizzes() {
-  const { cid } = useParams();
+  const params = useParams();
+  const cid = Array.isArray(params.cid) ? params.cid[0] : params.cid;
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -60,7 +61,7 @@ export default function Quizzes() {
   };
 
   const handleEdit = (quiz: any) => {
-    router.push(`/Kambaz/Courses/${quiz.course}/Quizzes/${quiz._id}/Edit`)
+    router.push(`/Courses/${quiz.course}/Quizzes/${quiz._id}/Edit`)
   }
 
   const handlePublish = async (quiz: any, publish: boolean) => {
@@ -114,7 +115,7 @@ export default function Quizzes() {
                     </Col>
 
                     <Col>
-                      <Link href={`/Kambaz/Courses/${quiz.course}/Quizzes/${quiz._id}/Details`} className="wd-quiz-link" >
+                      <Link href={`/Courses/${quiz.course}/Quizzes/${quiz._id}/Details`} className="wd-quiz-link" >
                         {quiz.title}
                       </Link>
                       <br />

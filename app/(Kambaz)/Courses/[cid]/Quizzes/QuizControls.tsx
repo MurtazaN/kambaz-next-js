@@ -9,11 +9,11 @@ import FacultyRoute from "../../../Account/FacultyRoute";
 
 export default function QuizControls() {
     const router = useRouter();
-    const { cid } = useParams();
+    const params = useParams();
+    const cid = Array.isArray(params.cid) ? params.cid[0] : params.cid;
 
     const handleQuizEditor = () => {
-        // router.push(`New`);
-        router.push(`/Kambaz/Courses/${cid}/Quizzes/New`);
+        router.push(`/Courses/${cid}/Quizzes/New`);
     };
 
     return (
