@@ -66,54 +66,54 @@ export default function QuizDetails() {
                 {currentUser && currentUser.role === "FACULTY" && quiz && (
                     <table className="table table-borderless mt-2 mb-3" style={{ borderBottom: '2px solid #dee2e6' }}>
                         <tbody>
-                        <tr>
-                            <th className="text-end w-50 pe-4">Quiz Type</th>
-                            <td>{quiz.quizType}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Points</th>
-                            <td>{quiz.points}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Assignment Group</th>
-                            <td>{quiz.assignmentGroup}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Shuffle Answers</th>
-                            <td>{quiz.shuffleAnswers}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Time Limit</th>
-                            <td>{quiz.timeLimit}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Multiple Attempts</th>
-                            <td>{quiz.multipleAttempts ? "Yes" : "No"}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">How Many Attempts</th>
-                            <td>{quiz.howManyAttempts}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Show Correct Answers</th>
-                            <td>{quiz.showCorrectAnswers}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Access Code</th>
-                            <td>{quiz.accessCode || "None"}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">One Question At A Time</th>
-                            <td>{quiz.oneQuestionAtATime}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Webcam Required</th>
-                            <td>{quiz.webcamRequired}</td>
-                        </tr>
-                        <tr>
-                            <th className="text-end pe-4">Lock Questions After Answering</th>
-                            <td>{quiz.lockQuestionsAfterAnswering}</td>
-                        </tr>
+                            <tr>
+                                <th className="text-end w-50 pe-4">Quiz Type</th>
+                                <td>{quiz.quizType}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Points</th>
+                                <td>{quiz.points}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Assignment Group</th>
+                                <td>{quiz.assignmentGroup}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Shuffle Answers</th>
+                                <td>{quiz.shuffleAnswers}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Time Limit</th>
+                                <td>{quiz.timeLimit}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Multiple Attempts</th>
+                                <td>{quiz.multipleAttempts ? "Yes" : "No"}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">How Many Attempts</th>
+                                <td>{quiz.howManyAttempts}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Show Correct Answers</th>
+                                <td>{quiz.showCorrectAnswers}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Access Code</th>
+                                <td>{quiz.accessCode || "None"}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">One Question At A Time</th>
+                                <td>{quiz.oneQuestionAtATime}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Webcam Required</th>
+                                <td>{quiz.webcamRequired}</td>
+                            </tr>
+                            <tr>
+                                <th className="text-end pe-4">Lock Questions After Answering</th>
+                                <td>{quiz.lockQuestionsAfterAnswering}</td>
+                            </tr>
                         </tbody>
                     </table>
                 )}
@@ -122,20 +122,20 @@ export default function QuizDetails() {
 
                 <table className="table">
                     <thead>
-                    <tr style={{ borderBottom: '2px solid #dee2e6' }}>
-                        <th>Due Date</th>
-                        <th>Available Date</th>
-                        <th>Until Date</th>
-                        <th>Attempts Allowed</th>
-                    </tr>
+                        <tr style={{ borderBottom: '2px solid #dee2e6' }}>
+                            <th>Due Date</th>
+                            <th>Available Date</th>
+                            <th>Until Date</th>
+                            <th>Attempts Allowed</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr style={{ borderBottom: '2px solid #dee2e6' }}>
-                        <td>{formatDate(quiz.dueDate)} at 11:59pm</td>
-                        <td>{formatDate(quiz.availableDate)} at 11:59pm</td>
-                        <td>{formatDate(quiz.untilDate)} at 11:59pm</td>
-                        <td>{quiz.howManyAttempts}</td>
-                    </tr>
+                        <tr style={{ borderBottom: '2px solid #dee2e6' }}>
+                            <td>{formatDate(quiz.dueDate)} at 11:59pm</td>
+                            <td>{formatDate(quiz.availableDate)} at 11:59pm</td>
+                            <td>{formatDate(quiz.untilDate)} at 11:59pm</td>
+                            <td>{quiz.howManyAttempts}</td>
+                        </tr>
                     </tbody>
                 </table>
 
