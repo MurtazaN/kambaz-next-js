@@ -28,9 +28,12 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
     const createQuestionForQuiz = async () => {
         if (!qid) return;
         const newQuestion = {
+            _id: `QQ${Date.now()}`,
+            quizId: qid,
             title: "New Question",
-            type: "MCQ",
-            points: 0
+            type: "Multiple Choice",
+            points: 0,
+            question: "Enter your question here"
         };
         const question = await quizClient.createQuestionForQuiz(qid, newQuestion);
         dispatch(addQuestion(question));

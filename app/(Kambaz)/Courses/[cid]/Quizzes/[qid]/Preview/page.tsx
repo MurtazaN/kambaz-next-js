@@ -264,6 +264,7 @@ export default function QuizPreview() {
 
                 <div className="ms-3 me-3 mt-4 d-flex justify-content-center">
                     <Button onClick={handleSubmit} className="me-2" variant="danger">Submit Quiz</Button>
+                    <Link href={`/Courses/${cid}/Quizzes/${qid}/Details`} className="btn btn-secondary me-2">Back to Details</Link>
                     <Link href={`/Courses/${cid}/Quizzes/${qid}/Edit`} className="btn btn-secondary me-2">Edit Quiz</Link>
                 </div>
 

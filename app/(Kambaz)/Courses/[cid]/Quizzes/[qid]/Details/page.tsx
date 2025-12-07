@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { FaPencilAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import * as attemptClient from "../Student/attemptClient";
+import * as quizClient from "../../client";
 import DOMPurify from 'dompurify';
 
 export default function QuizDetails() {
@@ -29,13 +30,34 @@ export default function QuizDetails() {
     }
 
     useEffect(() => {
-        if (qid && quizzes.length > 0) {
-            const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
-            setQuiz(foundQuiz);
-            if (foundQuiz && currentUser?._id) {
-                getAttemptsForUser(currentUser._id, qid);
+        const loadQuiz = async () => {
+            if (!qid) return;
+
+            // First try to get from Redux store
+            if (quizzes.length > 0) {
+                const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
+                if (foundQuiz) {
+                    setQuiz(foundQuiz);
+                    if (foundQuiz && currentUser?._id) {
+                        getAttemptsForUser(currentUser._id, qid);
+                    }
+                    return;
+                }
             }
-        }
+
+            // If not in Redux store, fetch from API
+            try {
+                const fetchedQuiz = await quizClient.findQuizById(qid as string);
+                setQuiz(fetchedQuiz);
+                if (fetchedQuiz && currentUser?._id) {
+                    getAttemptsForUser(currentUser._id, qid);
+                }
+            } catch (error) {
+                console.error("Failed to fetch quiz:", error);
+            }
+        };
+
+        loadQuiz();
     }, [qid, quizzes, currentUser]);
 
     const formatDate = (dateStr: string) => {
@@ -44,7 +66,7 @@ export default function QuizDetails() {
             month: "short",
             day: "numeric"
         });
-    }
+    };
 
     function createMarkup(html: any) {
         return { __html: DOMPurify.sanitize(html) };
