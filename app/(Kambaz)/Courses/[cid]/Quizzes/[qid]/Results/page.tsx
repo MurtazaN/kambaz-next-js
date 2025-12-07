@@ -67,16 +67,20 @@ export default function QuizResults() {
                 <h5 className="mt-3">Attempt History</h5>
 
                 <table className="table">
+                    <thead>
                     <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                         <th></th>
                         <th>Attempt</th>
                         <th>Score</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                         <td>LATEST</td>
                         <td>{noAttemptsTaken} out of {quiz.howManyAttempts}</td>
                         <td>{recentAttempt.points} / {quiz.points} pts</td>
                     </tr>
+                    </tbody>
                 </table>
             </div>
 

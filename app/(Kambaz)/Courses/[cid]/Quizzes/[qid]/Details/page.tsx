@@ -8,25 +8,35 @@ import * as attemptClient from "../Student/attemptClient";
 import DOMPurify from 'dompurify';
 
 export default function QuizDetails() {
-    const { cid, qid } = useParams();
+    const params = useParams();
+    const cid = Array.isArray(params.cid) ? params.cid[0] : params.cid;
+    const qid = Array.isArray(params.qid) ? params.qid[0] : params.qid;
     const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-    const [quiz, setQuiz] = useState<any>({});
+    const [quiz, setQuiz] = useState<any>(null);
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
 
     const [noAttemptsTaken, setNoAttemptsTaken] = useState<number>(0);
 
     const getAttemptsForUser = async (userId: string, quizId: string) => {
-        const attempts = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
-        setNoAttemptsTaken(attempts.length);
+        if (!userId || !quizId) return;
+        try {
+            const attempts = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
+            setNoAttemptsTaken(attempts.length);
+        } catch (error) {
+            console.error("Failed to fetch attempts:", error);
+        }
     }
 
     useEffect(() => {
-        setQuiz(
-            quizzes.find((quiz: any) => quiz._id === qid)
-        );
-        getAttemptsForUser(currentUser._id, qid as string);
-    }, [qid]);
+        if (qid && quizzes.length > 0) {
+            const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
+            setQuiz(foundQuiz);
+            if (foundQuiz && currentUser?._id) {
+                getAttemptsForUser(currentUser._id, qid);
+            }
+        }
+    }, [qid, quizzes, currentUser]);
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
@@ -40,6 +50,10 @@ export default function QuizDetails() {
         return { __html: DOMPurify.sanitize(html) };
     }
 
+    if (!quiz) {
+        return <div className="text-center mt-5">Loading quiz details...</div>;
+    }
+
     return (
         <div id="wd-quiz-details" className="d-flex flex-column align-items-center justify-content-center">
 
@@ -51,6 +65,7 @@ export default function QuizDetails() {
 
                 {currentUser && currentUser.role === "FACULTY" && quiz && (
                     <table className="table table-borderless mt-2 mb-3" style={{ borderBottom: '2px solid #dee2e6' }}>
+                        <tbody>
                         <tr>
                             <th className="text-end w-50 pe-4">Quiz Type</th>
                             <td>{quiz.quizType}</td>
@@ -99,25 +114,29 @@ export default function QuizDetails() {
                             <th className="text-end pe-4">Lock Questions After Answering</th>
                             <td>{quiz.lockQuestionsAfterAnswering}</td>
                         </tr>
-
+                        </tbody>
                     </table>
                 )}
 
 
 
                 <table className="table">
+                    <thead>
                     <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                         <th>Due Date</th>
                         <th>Available Date</th>
                         <th>Until Date</th>
                         <th>Attempts Allowed</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                         <td>{formatDate(quiz.dueDate)} at 11:59pm</td>
                         <td>{formatDate(quiz.availableDate)} at 11:59pm</td>
                         <td>{formatDate(quiz.untilDate)} at 11:59pm</td>
                         <td>{quiz.howManyAttempts}</td>
                     </tr>
+                    </tbody>
                 </table>
 
 
