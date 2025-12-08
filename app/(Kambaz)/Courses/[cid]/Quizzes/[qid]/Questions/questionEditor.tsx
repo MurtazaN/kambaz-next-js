@@ -87,7 +87,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
         }));
     };
 
-    const handleMarkCorrect = (answer: String) => {
+    const handleMarkCorrect = (answer: string) => {
         setQuestion((prevState: any) => ({
             ...prevState,
             correctAnswer: answer
@@ -101,7 +101,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
         setNewAnswer("");
     };
 
-    const removePossibleAnswer = (posAnswer: String) => {
+    const removePossibleAnswer = (posAnswer: string) => {
         setPossibleAnswersList(possibleAnswersList.filter(answer => answer !== posAnswer))
     }
 
@@ -109,7 +109,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
         setQuestion((prevState: any) => ({ ...prevState, question: e.target.value }));
     }
 
-    const updateQuizPoints = async (points: Number) => {
+    const updateQuizPoints = async (points: number) => {
         await quizClient.updateQuiz({ ...quiz, points: points });
         dispatch(updateQuiz({ ...quiz, points: points }));
     }

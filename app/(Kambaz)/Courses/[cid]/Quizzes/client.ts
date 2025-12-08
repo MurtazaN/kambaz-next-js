@@ -5,7 +5,7 @@ const axiosWithCredentials = axios.create({ withCredentials: true });
 const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 const QUIZZES_API = `${HTTP_SERVER}/api/quizzes`;
 
-export const findQuizById = async (id: String) => {
+export const findQuizById = async (id: string) => {
     const { data } = await axiosWithCredentials.get(`${QUIZZES_API}/${id}`);
     return data;
 };
