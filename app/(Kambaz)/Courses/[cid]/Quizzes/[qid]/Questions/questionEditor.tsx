@@ -52,26 +52,26 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
             editing: false,
         };
 
-        // Handle different question types with correct schema structure
+        // handle different question types with correct schema structure
         if (questionChanges.type === "Multiple Choice") {
-            // Multiple Choice uses choices array with {text, isCorrect}
+            // MCQ uses choices array with {text, isCorrect}
             updatedQuestion.choices = possibleAnswersList.map((answer: any) => ({
                 text: answer,
                 isCorrect: answer === questionChanges.correctAnswer
             }));
-            // Clear possibleAnswers for Multiple Choice
+            // clear possibleAnswers for MCQ
             updatedQuestion.possibleAnswers = [];
         } else if (questionChanges.type === "Fill in the Blank") {
-            // Fill in the Blank uses possibleAnswers array with {text, caseSensitive}
+            // fill in the Blank uses possibleAnswers array with {text, caseSensitive}
             updatedQuestion.possibleAnswers = possibleAnswersList.map((answer: any) => ({
                 text: answer,
                 caseSensitive: false
             }));
-            // Clear choices for Fill in the Blank
+            // clear choices for Fill in the Blank
             updatedQuestion.choices = [];
         } else if (questionChanges.type === "True/False") {
             // True/False only uses correctAnswer (boolean)
-            // Clear both choices and possibleAnswers
+            // clear both choices and possibleAnswers
             updatedQuestion.choices = [];
             updatedQuestion.possibleAnswers = [];
         }

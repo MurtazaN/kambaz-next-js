@@ -24,6 +24,7 @@ export default function QuizEditor() {
         shuffleAnswers: true,
         timeLimit: 20,
         multipleAttempts: false,
+        howManyAttempts: 1,
         showCorrectAnswers: "",
         accessCode: "",
         oneQuestionAtATime: true,

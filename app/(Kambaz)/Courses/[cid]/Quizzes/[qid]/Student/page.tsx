@@ -17,14 +17,64 @@ export default function StartQuiz() {
     const router = useRouter();
     const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-    const [quiz, setQuiz] = useState<any>({});
+    const [quiz, setQuiz] = useState<any>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
     const { questions } = useSelector((state: any) => state.quizzesReducer);
+    const [noAttemptsTaken, setNoAttemptsTaken] = useState<number>(0);
+    const [attemptsExceeded, setAttemptsExceeded] = useState<boolean>(false);
+
+    const getAttemptsForUser = async (userId: string, quizId: string) => {
+        if (!userId || !quizId) return;
+        try {
+            const attempts = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
+            setNoAttemptsTaken(attempts?.length || 0);
+            return attempts?.length || 0;
+        } catch (error) {
+            console.error("Failed to fetch attempts:", error);
+            setNoAttemptsTaken(0);
+            return 0;
+        }
+    }
 
     useEffect(() => {
-        setQuiz(quizzes.find((quiz: any) => quiz._id === qid));
-    }, [qid, quizzes]);
+        const loadQuiz = async () => {
+            if (!qid || !currentUser?._id) return;
+
+            // First try to get from Redux store
+            if (quizzes.length > 0) {
+                const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
+                if (foundQuiz) {
+                    setQuiz(foundQuiz);
+                    const attemptCount = await getAttemptsForUser(currentUser._id, qid);
+                    // Check if attempts exceeded
+                    if (foundQuiz.multipleAttempts && attemptCount >= (foundQuiz.howManyAttempts || 1)) {
+                        setAttemptsExceeded(true);
+                    } else if (!foundQuiz.multipleAttempts && attemptCount >= 1) {
+                        setAttemptsExceeded(true);
+                    }
+                    return;
+                }
+            }
+
+            // If not in Redux store, fetch from API
+            try {
+                const fetchedQuiz = await quizClient.findQuizById(qid as string);
+                setQuiz(fetchedQuiz);
+                const attemptCount = await getAttemptsForUser(currentUser._id, qid);
+                // Check if attempts exceeded
+                if (fetchedQuiz.multipleAttempts && attemptCount >= (fetchedQuiz.howManyAttempts || 1)) {
+                    setAttemptsExceeded(true);
+                } else if (!fetchedQuiz.multipleAttempts && attemptCount >= 1) {
+                    setAttemptsExceeded(true);
+                }
+            } catch (error) {
+                console.error("Failed to load quiz:", error);
+            }
+        };
+
+        loadQuiz();
+    }, [qid, quizzes, currentUser?._id]);
 
     const fetchQuestions = async () => {
         const questions = await quizClient.findQuestionsForQuiz(qid as string);
@@ -67,14 +117,26 @@ export default function StartQuiz() {
 
         questions.forEach((question: any) => {
             const userAnswer = answers[question._id];
-            const correctAnswer = question.correctAnswer;
 
             if (question.type === "Fill in the Blank") {
-                if (question.possibleAnswers.includes(userAnswer)) {
+                // Check if answer matches any possible answer
+                const isMatch = question.possibleAnswers?.some((ans: any) =>
+                    ans.caseSensitive
+                        ? ans.text === userAnswer
+                        : ans.text?.toLowerCase() === userAnswer?.toLowerCase()
+                );
+                if (isMatch) {
                     calculatedScore += question.points;
                 }
-            } else {
-                if (userAnswer === correctAnswer) {
+            } else if (question.type === "Multiple Choice") {
+                // Find the correct choice
+                const correctChoice = question.choices?.find((choice: any) => choice.isCorrect);
+                if (correctChoice && userAnswer === correctChoice.text) {
+                    calculatedScore += question.points;
+                }
+            } else if (question.type === "True/False") {
+                // Compare with correctAnswer
+                if (userAnswer === question.correctAnswer) {
                     calculatedScore += question.points;
                 }
             }
@@ -118,14 +180,45 @@ export default function StartQuiz() {
 
     const isCorrect = (question: any) => {
         const userAnswer = answers[question._id];
+
         if (question.type === "Fill in the Blank") {
-            return question.possibleAnswers.includes(userAnswer);
+            return question.possibleAnswers?.some((ans: any) =>
+                ans.caseSensitive
+                    ? ans.text === userAnswer
+                    : ans.text?.toLowerCase() === userAnswer?.toLowerCase()
+            );
+        } else if (question.type === "Multiple Choice") {
+            const correctChoice = question.choices?.find((choice: any) => choice.isCorrect);
+            return correctChoice && userAnswer === correctChoice.text;
+        } else if (question.type === "True/False") {
+            return userAnswer === question.correctAnswer;
         }
-        return userAnswer === question.correctAnswer;
+        return false;
     };
 
     function createMarkup(html: any) {
         return { __html: DOMPurify.sanitize(html) };
+    }
+
+    if (!quiz) {
+        return <div>Loading quiz...</div>;
+    }
+
+    if (attemptsExceeded) {
+        return (
+            <div className="d-flex flex-column align-items-center justify-content-center mt-5">
+                <h4>{quiz.title}</h4>
+                <div className="alert alert-warning mt-3" role="alert">
+                    <strong>No attempts remaining.</strong>
+                    <p className="mb-0">
+                        You have used all {noAttemptsTaken} of {quiz.howManyAttempts || 1} allowed attempts for this quiz.
+                    </p>
+                </div>
+                <Button variant="secondary" href={`/Courses/${cid}/Quizzes/${qid}/Results`} className="mt-3">
+                    View Results
+                </Button>
+            </div>
+        );
     }
 
     return (
@@ -147,9 +240,9 @@ export default function StartQuiz() {
 
                                 <hr />
 
-                                {(currentQuestion.type === "Multiple Choice" || currentQuestion.type === "True/False") && (
-                                    currentQuestion.possibleAnswers.map((option: any, index: number) => (
-                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                {currentQuestion.type === "Multiple Choice" && currentQuestion.choices && (
+                                    currentQuestion.choices.map((choice: any, index: number) => (
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3" key={index}>
                                             <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
                                                 <div className="form-check">
                                                     <input
@@ -157,17 +250,58 @@ export default function StartQuiz() {
                                                         type="radio"
                                                         name={`question-${currentQuestion._id}`}
                                                         id={`option-${index}`}
-                                                        value={option}
-                                                        checked={answers[currentQuestion._id] === option}
-                                                        onChange={() => handleAnswerChange(currentQuestion._id, option)}
+                                                        value={choice.text}
+                                                        checked={answers[currentQuestion._id] === choice.text}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, choice.text)}
                                                     />
                                                     <label className="form-check-label" htmlFor={`option-${index}`}>
-                                                        {option}
+                                                        {choice.text}
                                                     </label>
                                                 </div>
                                             </ListGroup.Item>
                                         </ListGroup>
                                     ))
+                                )}
+
+                                {currentQuestion.type === "True/False" && (
+                                    <div>
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${currentQuestion._id}`}
+                                                        id="option-true"
+                                                        value="true"
+                                                        checked={answers[currentQuestion._id] === "true"}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, "true")}
+                                                    />
+                                                    <label className="form-check-label" htmlFor="option-true">
+                                                        True
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${currentQuestion._id}`}
+                                                        id="option-false"
+                                                        value="false"
+                                                        checked={answers[currentQuestion._id] === "false"}
+                                                        onChange={() => handleAnswerChange(currentQuestion._id, "false")}
+                                                    />
+                                                    <label className="form-check-label" htmlFor="option-false">
+                                                        False
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                    </div>
                                 )}
 
                                 {currentQuestion.type === "Fill in the Blank" && (

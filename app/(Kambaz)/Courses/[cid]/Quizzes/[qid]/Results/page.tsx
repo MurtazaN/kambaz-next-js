@@ -109,7 +109,7 @@ export default function QuizResults() {
                         <tbody>
                             <tr style={{ borderBottom: '2px solid #dee2e6' }}>
                                 <td>LATEST</td>
-                                <td>{noAttemptsTaken} out of {quiz.howManyAttempts}</td>
+                                <td>{noAttemptsTaken} out of {quiz.howManyAttempts || 1}</td>
                                 <td>{recentAttempt.score} / {quiz.points} pts</td>
                             </tr>
                         </tbody>
@@ -134,11 +134,40 @@ export default function QuizResults() {
 
                                 <hr />
 
-                                {(question.type === "Multiple Choice" || question.type === "True/False") && (
-                                    question.possibleAnswers.map((option: any, index: number) => (
+                                {question.type === "Multiple Choice" && question.choices && (
+                                    question.choices.map((choice: any, index: number) => (
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3" key={index}>
+                                            <ListGroup.Item
+                                                className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === choice.text
+                                                        ? answersMap[question._id]?.isCorrect
+                                                            ? 'bg-success bg-opacity-25'
+                                                            : 'bg-danger bg-opacity-25'
+                                                        : 'bg-transparent'
+                                                    }`}>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${question._id}`}
+                                                        id={`option-${index}`}
+                                                        value={choice.text}
+                                                        checked={answersMap[question._id]?.answer === choice.text}
+                                                        readOnly
+                                                    />
+                                                    <label className="form-check-label" htmlFor={`option-${index}`}>
+                                                        {choice.text}
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                    ))
+                                )}
+
+                                {question.type === "True/False" && (
+                                    <div>
                                         <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
                                             <ListGroup.Item
-                                                className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === option
+                                                className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === "true"
                                                     ? answersMap[question._id]?.isCorrect
                                                         ? 'bg-success bg-opacity-25'
                                                         : 'bg-danger bg-opacity-25'
@@ -149,21 +178,43 @@ export default function QuizResults() {
                                                         className="form-check-input"
                                                         type="radio"
                                                         name={`question-${question._id}`}
-                                                        id={`option-${index}`}
-                                                        value={option}
-                                                        checked={answersMap[question._id]?.answer === option}
+                                                        id="result-option-true"
+                                                        value="true"
+                                                        checked={answersMap[question._id]?.answer === "true"}
                                                         readOnly
                                                     />
-                                                    <label className="form-check-label" htmlFor={`option-${index}`}>
-                                                        {option}
+                                                    <label className="form-check-label" htmlFor="result-option-true">
+                                                        True
                                                     </label>
                                                 </div>
                                             </ListGroup.Item>
                                         </ListGroup>
-                                    ))
-                                )}
-
-                                {question.type === "Fill in the Blank" && (
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item
+                                                className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === "false"
+                                                    ? answersMap[question._id]?.isCorrect
+                                                        ? 'bg-success bg-opacity-25'
+                                                        : 'bg-danger bg-opacity-25'
+                                                    : 'bg-transparent'
+                                                    }`}>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${question._id}`}
+                                                        id="result-option-false"
+                                                        value="false"
+                                                        checked={answersMap[question._id]?.answer === "false"}
+                                                        readOnly
+                                                    />
+                                                    <label className="form-check-label" htmlFor="result-option-false">
+                                                        False
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                    </div>
+                                )}                                {question.type === "Fill in the Blank" && (
                                     <div className="d-flex gap-2 mt-3 mb-3">
                                         <FormControl
                                             className={`${answersMap[question._id]?.isCorrect

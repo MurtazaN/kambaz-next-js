@@ -115,7 +115,7 @@ export default function QuizDetails() {
                             </tr>
                             <tr>
                                 <th className="text-end pe-4">How Many Attempts</th>
-                                <td>{quiz.howManyAttempts}</td>
+                                <td>{quiz.howManyAttempts || 1}</td>
                             </tr>
                             <tr>
                                 <th className="text-end pe-4">Show Correct Answers</th>
@@ -157,7 +157,7 @@ export default function QuizDetails() {
                             <td>{formatDate(quiz.dueDate)} at 11:59pm</td>
                             <td>{formatDate(quiz.availableDate)} at 11:59pm</td>
                             <td>{formatDate(quiz.untilDate)} at 11:59pm</td>
-                            <td>{quiz.howManyAttempts}</td>
+                            <td>{quiz.howManyAttempts || 1}</td>
                         </tr>
                     </tbody>
                 </table>
