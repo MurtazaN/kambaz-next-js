@@ -23,9 +23,10 @@ export default function QuizDetails() {
         if (!userId || !quizId) return;
         try {
             const attempts = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
-            setNoAttemptsTaken(attempts.length);
+            setNoAttemptsTaken(attempts?.length || 0);
         } catch (error) {
             console.error("Failed to fetch attempts:", error);
+            setNoAttemptsTaken(0);
         }
     }
 
@@ -177,9 +178,9 @@ export default function QuizDetails() {
                     </>
                 )}
 
-                {currentUser && currentUser.role === "STUDENT" && (
-                    noAttemptsTaken < quiz.howManyAttempts ? (
-                        <Button variant="secondary" href={`/Courses/${cid}/Quizzes/${qid}`} id="wd-quiz-start-btn">
+                {currentUser && currentUser.role === "STUDENT" && quiz && (
+                    (!quiz.multipleAttempts || noAttemptsTaken < (quiz.howManyAttempts || 1)) ? (
+                        <Button variant="secondary" href={`/Courses/${cid}/Quizzes/${qid}/Student`} id="wd-quiz-start-btn">
                             Start Quiz
                         </Button>
                     ) : (

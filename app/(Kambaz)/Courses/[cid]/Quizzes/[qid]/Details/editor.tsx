@@ -16,8 +16,6 @@ export default function DetailsEditor({ quiz, setQuiz }: {
     const pathname = usePathname();
     const router = useRouter();
 
-    console.log("DetailsEditor - params:", params, "cid:", cid);
-
     const createQuizForCourse = async (quiz: any) => {
         if (!cid) return;
         const quizWithId = {
@@ -29,21 +27,17 @@ export default function DetailsEditor({ quiz, setQuiz }: {
     };
 
     const saveQuiz = async (quiz: any) => {
-        console.log("Saving quiz:", quiz);
         await quizClient.updateQuiz(quiz);
         dispatch(updateQuiz(quiz));
-        console.log("Quiz saved and dispatched to Redux");
     };
 
     const handleSave = async (quiz: any) => {
-        console.log("handleSave called, pathname:", pathname);
         if (pathname.includes("New")) {
             await createQuizForCourse(quiz);
         }
         else {
             await saveQuiz(quiz);
         }
-        console.log("Navigating to:", `/Courses/${cid}/Quizzes`);
         router.push(`/Courses/${cid}/Quizzes`);
     }
 

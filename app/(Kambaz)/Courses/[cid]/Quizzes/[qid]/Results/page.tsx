@@ -12,8 +12,8 @@ export default function QuizResults() {
     const qid = Array.isArray(params.qid) ? params.qid[0] : params.qid;
     const { currentUser } = useSelector((state: any) => state.accountReducer);
 
-    const [quiz, setQuiz] = useState<any>({});
-    const [recentAttempt, setRecentAttempt] = useState<any>({});
+    const [quiz, setQuiz] = useState<any>(null);
+    const [recentAttempt, setRecentAttempt] = useState<any>(null);
     const [questions, setQuestions] = useState<any>([]);
     const { quizzes } = useSelector((state: any) => state.quizzesReducer);
 
@@ -27,14 +27,19 @@ export default function QuizResults() {
     const [answersMap, setAnswersMap] = useState<any>({});
 
     const getRecentAttempt = async (userId: string, quizId: string) => {
-        const attempt = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
-        setRecentAttempt(attempt);
+        const attempts = await attemptClient.fetchAttemptsByUserAndQuiz(userId, quizId);
+        if (attempts && attempts.length > 0) {
+            const latestAttempt = attempts[attempts.length - 1];
+            setRecentAttempt(latestAttempt);
 
-        const map: Record<string, any> = {};
-        attempt.answers.forEach((a: any) => {
-            map[a.questionId] = a;
-        });
-        setAnswersMap(map);
+            const map: Record<string, any> = {};
+            if (latestAttempt.answers) {
+                latestAttempt.answers.forEach((a: any) => {
+                    map[a.questionId] = a;
+                });
+            }
+            setAnswersMap(map);
+        }
     }
 
     const fetchQuestions = async () => {
@@ -43,16 +48,42 @@ export default function QuizResults() {
     };
 
     useEffect(() => {
-        setQuiz(
-            quizzes.find((quiz: any) => quiz._id === qid)
-        );
-        fetchQuestions();
-        getAttemptsForUser(currentUser._id, qid as string);
-        getRecentAttempt(currentUser._id, qid as string);
-    }, [qid]);
+        const loadQuiz = async () => {
+            if (!qid || !currentUser?._id) return;
+
+            // First try to get from Redux store
+            if (quizzes.length > 0) {
+                const foundQuiz = quizzes.find((quiz: any) => quiz._id === qid);
+                if (foundQuiz) {
+                    setQuiz(foundQuiz);
+                    fetchQuestions();
+                    getAttemptsForUser(currentUser._id, qid as string);
+                    getRecentAttempt(currentUser._id, qid as string);
+                    return;
+                }
+            }
+
+            // If not in Redux store, fetch from API
+            try {
+                const fetchedQuiz = await quizClient.findQuizById(qid as string);
+                setQuiz(fetchedQuiz);
+                fetchQuestions();
+                getAttemptsForUser(currentUser._id, qid as string);
+                getRecentAttempt(currentUser._id, qid as string);
+            } catch (error) {
+                console.error("Failed to load quiz:", error);
+            }
+        };
+
+        loadQuiz();
+    }, [qid, currentUser?._id]);
 
     function createMarkup(html: any) {
         return { __html: DOMPurify.sanitize(html) };
+    }
+
+    if (!quiz) {
+        return <div>Loading quiz results...</div>;
     }
 
     return (
@@ -66,89 +97,94 @@ export default function QuizResults() {
 
                 <h5 className="mt-3">Attempt History</h5>
 
-                <table className="table">
-                    <thead>
-                    <tr style={{ borderBottom: '2px solid #dee2e6' }}>
-                        <th></th>
-                        <th>Attempt</th>
-                        <th>Score</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr style={{ borderBottom: '2px solid #dee2e6' }}>
-                        <td>LATEST</td>
-                        <td>{noAttemptsTaken} out of {quiz.howManyAttempts}</td>
-                        <td>{recentAttempt.points} / {quiz.points} pts</td>
-                    </tr>
-                    </tbody>
-                </table>
+                {recentAttempt ? (
+                    <table className="table">
+                        <thead>
+                            <tr style={{ borderBottom: '2px solid #dee2e6' }}>
+                                <th></th>
+                                <th>Attempt</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style={{ borderBottom: '2px solid #dee2e6' }}>
+                                <td>LATEST</td>
+                                <td>{noAttemptsTaken} out of {quiz.howManyAttempts}</td>
+                                <td>{recentAttempt.score} / {quiz.points} pts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                ) : (
+                    <p className="text-muted">No attempts yet</p>
+                )}
             </div>
 
-            <div className="mt-4 d-flex flex-column align-items-center">
-                {questions.map((question: any) => (
-                    <Card className={`w-75 ms-3 me-3 mb-3 mt-4 ${answersMap[question._id]?.correct ? 'border-success shadow-lg' : 'border-danger shadow-lg'}`}>
-                        <Card.Header className="d-flex justify-content-between align-items-center">
-                            <span>{question.title}</span>
-                            <span>{question.points} pts</span>
-                        </Card.Header>
-                        <Card.Body>
-                            <div
-                                dangerouslySetInnerHTML={createMarkup(question.question)}
-                            />
+            {recentAttempt && questions.length > 0 && (
+                <div className="mt-4 d-flex flex-column align-items-center">
+                    {questions.map((question: any) => (
+                        <Card className={`w-75 ms-3 me-3 mb-3 mt-4 ${answersMap[question._id]?.isCorrect ? 'border-success shadow-lg' : 'border-danger shadow-lg'}`}>
+                            <Card.Header className="d-flex justify-content-between align-items-center">
+                                <span>{question.title}</span>
+                                <span>{question.points} pts</span>
+                            </Card.Header>
+                            <Card.Body>
+                                <div
+                                    dangerouslySetInnerHTML={createMarkup(question.question)}
+                                />
 
-                            <hr />
+                                <hr />
 
-                            {(question.type === "MCQ" || question.type === "TF") && (
-                                question.possibleAnswers.map((option: any, index: number) => (
-                                    <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
-                                        <ListGroup.Item
-                                            className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.userAnswer === option
-                                                ? answersMap[question._id]?.correct
-                                                    ? 'bg-success bg-opacity-25'
-                                                    : 'bg-danger bg-opacity-25'
-                                                : 'bg-transparent'
-                                                }`}>
-                                            <div className="form-check">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name={`question-${question._id}`}
-                                                    id={`option-${index}`}
-                                                    value={option}
-                                                    checked={answersMap[question._id]?.userAnswer === option}
-                                                    readOnly
-                                                />
-                                                <label className="form-check-label" htmlFor={`option-${index}`}>
-                                                    {option}
-                                                </label>
-                                            </div>
-                                        </ListGroup.Item>
-                                    </ListGroup>
-                                ))
-                            )}
+                                {(question.type === "Multiple Choice" || question.type === "True/False") && (
+                                    question.possibleAnswers.map((option: any, index: number) => (
+                                        <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
+                                            <ListGroup.Item
+                                                className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === option
+                                                    ? answersMap[question._id]?.isCorrect
+                                                        ? 'bg-success bg-opacity-25'
+                                                        : 'bg-danger bg-opacity-25'
+                                                    : 'bg-transparent'
+                                                    }`}>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name={`question-${question._id}`}
+                                                        id={`option-${index}`}
+                                                        value={option}
+                                                        checked={answersMap[question._id]?.answer === option}
+                                                        readOnly
+                                                    />
+                                                    <label className="form-check-label" htmlFor={`option-${index}`}>
+                                                        {option}
+                                                    </label>
+                                                </div>
+                                            </ListGroup.Item>
+                                        </ListGroup>
+                                    ))
+                                )}
 
-                            {question.type === "FITB" && (
-                                <div className="d-flex gap-2 mt-3 mb-3">
-                                    <FormControl
-                                        className={`${answersMap[question._id]?.correct
-                                            ? 'bg-success bg-opacity-25'
-                                            : 'bg-danger bg-opacity-25'
-                                            }`}
-                                        placeholder="Enter answer"
-                                        value={answersMap[question._id]?.userAnswer || ""}
-                                        readOnly
-                                    />
-                                </div>
-                            )}
+                                {question.type === "Fill in the Blank" && (
+                                    <div className="d-flex gap-2 mt-3 mb-3">
+                                        <FormControl
+                                            className={`${answersMap[question._id]?.isCorrect
+                                                ? 'bg-success bg-opacity-25'
+                                                : 'bg-danger bg-opacity-25'
+                                                }`}
+                                            placeholder="Enter answer"
+                                            value={answersMap[question._id]?.answer || ""}
+                                            readOnly
+                                        />
+                                    </div>
+                                )}
 
-                        </Card.Body>
-                        <Card.Footer>
+                            </Card.Body>
+                            <Card.Footer>
 
-                        </Card.Footer>
-                    </Card>
-                ))}
-
-            </div>
+                            </Card.Footer>
+                        </Card>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

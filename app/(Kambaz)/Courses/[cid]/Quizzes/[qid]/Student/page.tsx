@@ -69,7 +69,7 @@ export default function StartQuiz() {
             const userAnswer = answers[question._id];
             const correctAnswer = question.correctAnswer;
 
-            if (question.type === "FITB") {
+            if (question.type === "Fill in the Blank") {
                 if (question.possibleAnswers.includes(userAnswer)) {
                     calculatedScore += question.points;
                 }
@@ -82,37 +82,43 @@ export default function StartQuiz() {
         return calculatedScore;
     }
 
-    const createAttempt = async (attempt: any) => {
-        const newAttempt = await attemptClient.startQuizAttempt(attempt);
-        return newAttempt;
-    }
-
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const attemptAnswers = Object.entries(answers).map(([questionId, userAnswer]) => {
             const question = questions.find((q: any) => q._id === questionId);
             return {
                 questionId,
-                userAnswer,
-                correct: isCorrect(question)
+                answer: userAnswer,
+                isCorrect: isCorrect(question),
+                pointsEarned: isCorrect(question) ? question.points : 0
             };
         });
 
         let totalScore = calculateScore();
-        const newAttempt = {
-            user: currentUser._id,
-            quiz: quiz._id,
-            points: totalScore,
-            submittedAt: new Date,
-            answers: attemptAnswers
+        const totalPoints = questions.reduce((sum: number, q: any) => sum + q.points, 0);
+
+        const attemptData = {
+            userId: currentUser._id,
+            quizId: quiz._id,
+            score: totalScore,
+            totalPoints: totalPoints,
+            percentage: (totalScore / totalPoints) * 100,
+            answers: attemptAnswers,
+            submitted: true,
+            submittedAt: new Date().toISOString()
+        };
+
+        try {
+            const savedAttempt = await attemptClient.startQuizAttempt(attemptData);
+            dispatch(setAttempt(savedAttempt));
+            router.push(`/Courses/${cid}/Quizzes/${qid}/Results`);
+        } catch (error) {
+            console.error("Failed to submit quiz:", error);
         }
-        const attempt = createAttempt(newAttempt);
-        dispatch(setAttempt(attempt));
-        router.push(`/Courses/${cid}/Quizzes/${qid}/Results`);
     };
 
     const isCorrect = (question: any) => {
         const userAnswer = answers[question._id];
-        if (question.type === "FITB") {
+        if (question.type === "Fill in the Blank") {
             return question.possibleAnswers.includes(userAnswer);
         }
         return userAnswer === question.correctAnswer;
@@ -141,7 +147,7 @@ export default function StartQuiz() {
 
                                 <hr />
 
-                                {(currentQuestion.type === "MCQ" || currentQuestion.type === "TF") && (
+                                {(currentQuestion.type === "Multiple Choice" || currentQuestion.type === "True/False") && (
                                     currentQuestion.possibleAnswers.map((option: any, index: number) => (
                                         <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3">
                                             <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
@@ -164,7 +170,7 @@ export default function StartQuiz() {
                                     ))
                                 )}
 
-                                {currentQuestion.type === "FITB" && (
+                                {currentQuestion.type === "Fill in the Blank" && (
                                     <div className="d-flex gap-2 mt-3 mb-3">
                                         <FormControl
                                             placeholder="Enter answer"

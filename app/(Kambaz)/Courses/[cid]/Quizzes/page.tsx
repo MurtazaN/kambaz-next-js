@@ -28,18 +28,12 @@ export default function Quizzes() {
 
   const fetchQuizzes = async () => {
     const quizzes = await quizClient.findQuizzesForCourse(cid as string);
-    console.log("Fetched quizzes:", quizzes);
     dispatch(setQuizzes(quizzes));
   };
 
   useEffect(() => {
-    console.log("Quizzes page mounted/updated, cid:", cid);
     fetchQuizzes();
   }, [cid]);
-
-  useEffect(() => {
-    console.log("Quizzes from Redux:", quizzes);
-  }, [quizzes]);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);

@@ -13,10 +13,11 @@ export const fetchAttemptsByUserAndQuiz = async (userId: string, quizId: string)
     return data;
 };
 
-// startQuizAttempt(quizId)
-export const startQuizAttempt = async (quizId: string) => {
+// startQuizAttempt(attemptData)
+export const startQuizAttempt = async (attemptData: any) => {
     const response = await axiosWithCredentials.post(
-        `${ATTEMPTS_API}/quiz/${quizId}/start`
+        `${ATTEMPTS_API}/quiz/${attemptData.quizId}/start`,
+        attemptData
     );
     return response.data;
 }

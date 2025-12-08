@@ -7,9 +7,6 @@ import { setQuestions, addQuestion, updateQuestion, deleteQuestion, updateQuiz }
 import { Button, Col, Form, FormControl, ListGroup, Row } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import { FaPencil, FaTrash, FaRegCircleCheck, FaCircleCheck } from "react-icons/fa6";
-import ReactQuill from "react-quill";
-import { useRef } from "react";
-import 'react-quill/dist/quill.snow.css';
 
 export default function QuestionsEditor({ quiz, setQuiz }: {
     quiz: any;
@@ -18,7 +15,6 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
     const params = useParams();
     const qid = Array.isArray(params.qid) ? params.qid[0] : params.qid;
     const dispatch = useDispatch();
-    const quillRef = useRef(null);
 
     const { questions } = useSelector((state: any) => state.quizzesReducer);
 
@@ -51,12 +47,35 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
     }
 
     const saveQuestion = async () => {
-        const updatedQuestion = {
+        let updatedQuestion: any = {
             ...questionChanges,
-            possibleAnswers:
-                questionChanges.type === "TF" ? ["True", "False"] : possibleAnswersList,
             editing: false,
         };
+
+        // Handle different question types with correct schema structure
+        if (questionChanges.type === "Multiple Choice") {
+            // Multiple Choice uses choices array with {text, isCorrect}
+            updatedQuestion.choices = possibleAnswersList.map((answer: any) => ({
+                text: answer,
+                isCorrect: answer === questionChanges.correctAnswer
+            }));
+            // Clear possibleAnswers for Multiple Choice
+            updatedQuestion.possibleAnswers = [];
+        } else if (questionChanges.type === "Fill in the Blank") {
+            // Fill in the Blank uses possibleAnswers array with {text, caseSensitive}
+            updatedQuestion.possibleAnswers = possibleAnswersList.map((answer: any) => ({
+                text: answer,
+                caseSensitive: false
+            }));
+            // Clear choices for Fill in the Blank
+            updatedQuestion.choices = [];
+        } else if (questionChanges.type === "True/False") {
+            // True/False only uses correctAnswer (boolean)
+            // Clear both choices and possibleAnswers
+            updatedQuestion.choices = [];
+            updatedQuestion.possibleAnswers = [];
+        }
+
         await questionClient.updateQuestion(updatedQuestion);
         dispatch(updateQuestion(updatedQuestion));
     };
@@ -86,8 +105,8 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
         setPossibleAnswersList(possibleAnswersList.filter(answer => answer !== posAnswer))
     }
 
-    const handleQuestionChange = (ques: String) => {
-        setQuestion((prevState: any) => ({ ...prevState, question: ques }));
+    const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setQuestion((prevState: any) => ({ ...prevState, question: e.target.value }));
     }
 
     const updateQuizPoints = async (points: Number) => {
@@ -155,9 +174,9 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                             defaultValue={question.type}
                                             onChange={(e) => setQuestion((prevState: any) => ({ ...prevState, type: e.target.value }))}
                                         >
-                                            <option value="MCQ">MCQ</option>
-                                            <option value="FITB">Fill in the Blanks</option>
-                                            <option value="TF">True or False</option>
+                                            <option value="Multiple Choice">Multiple Choice</option>
+                                            <option value="Fill in the Blank">Fill in the Blank</option>
+                                            <option value="True/False">True/False</option>
                                         </Form.Select>
                                     </Col>
                                     <Col>
@@ -171,16 +190,17 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                 </div>
                                 <div className="mt-2">
                                     <h5>Question:</h5>
-                                    <ReactQuill
-                                        theme="snow"
+                                    <FormControl
+                                        as="textarea"
+                                        rows={5}
                                         value={questionChanges.question || ''}
                                         onChange={handleQuestionChange}
-                                        ref={quillRef}
+                                        placeholder="Enter your question here"
                                     />
 
                                     <h5 className="mt-2">Answers:</h5>
 
-                                    {questionChanges.type === "MCQ" && (
+                                    {questionChanges.type === "Multiple Choice" && (
                                         <div>
                                             <p>Enter possible answers then select the correct answer:</p>
                                             {possibleAnswersList.map((posAns) => (
@@ -213,7 +233,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                         </div>
                                     )}
 
-                                    {questionChanges.type === "TF" && (
+                                    {questionChanges.type === "True/False" && (
                                         <div>
                                             <p className="mb-2">Select the correct answer:</p>
                                             <Form.Check type="radio" name="wd-true-false-options" label="True" value="true"
@@ -225,7 +245,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                         </div>
                                     )}
 
-                                    {questionChanges.type === "FITB" && (
+                                    {questionChanges.type === "Fill in the Blank" && (
                                         <div>
                                             <p>Enter all possible correct answers:</p>
                                             {possibleAnswersList.map((posAns) => (
