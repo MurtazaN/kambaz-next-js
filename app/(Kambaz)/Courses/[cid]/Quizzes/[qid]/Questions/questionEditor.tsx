@@ -204,7 +204,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                         <div>
                                             <p>Enter possible answers then select the correct answer:</p>
                                             {possibleAnswersList.map((posAns) => (
-                                                <ListGroup className="w-75 d-flex gap-2 bg-light border-0 shadow-sm mb-2 rounded-3">
+                                                <ListGroup key={posAns} className="w-75 d-flex gap-2 bg-light border-0 shadow-sm mb-2 rounded-3">
                                                     <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
                                                         {posAns}
                                                         <div>
@@ -249,7 +249,7 @@ export default function QuestionsEditor({ quiz, setQuiz }: {
                                         <div>
                                             <p>Enter all possible correct answers:</p>
                                             {possibleAnswersList.map((posAns) => (
-                                                <ListGroup className="w-75 d-flex gap-2 bg-light border-0 shadow-sm mb-2 rounded-3">
+                                                <ListGroup key={posAns} className="w-75 d-flex gap-2 bg-light border-0 shadow-sm mb-2 rounded-3">
                                                     <ListGroup.Item className="d-flex justify-content-between align-items-center border-0 bg-transparent">
                                                         {posAns}
                                                         <FaTrash onClick={() => removePossibleAnswer(posAns)}

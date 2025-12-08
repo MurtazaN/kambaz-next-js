@@ -122,7 +122,7 @@ export default function QuizResults() {
             {recentAttempt && questions.length > 0 && (
                 <div className="mt-4 d-flex flex-column align-items-center">
                     {questions.map((question: any) => (
-                        <Card className={`w-75 ms-3 me-3 mb-3 mt-4 ${answersMap[question._id]?.isCorrect ? 'border-success shadow-lg' : 'border-danger shadow-lg'}`}>
+                        <Card key={question._id} className={`w-75 ms-3 me-3 mb-3 mt-4 ${answersMap[question._id]?.isCorrect ? 'border-success shadow-lg' : 'border-danger shadow-lg'}`}>
                             <Card.Header className="d-flex justify-content-between align-items-center">
                                 <span>{question.title}</span>
                                 <span>{question.points} pts</span>
@@ -139,10 +139,10 @@ export default function QuizResults() {
                                         <ListGroup className="d-flex gap-2 bg-light border-0 shadow-sm mb-2 ms-2 me-2 rounded-3" key={index}>
                                             <ListGroup.Item
                                                 className={`d-flex justify-content-between align-items-center border-0 ${answersMap[question._id]?.answer === choice.text
-                                                        ? answersMap[question._id]?.isCorrect
-                                                            ? 'bg-success bg-opacity-25'
-                                                            : 'bg-danger bg-opacity-25'
-                                                        : 'bg-transparent'
+                                                    ? answersMap[question._id]?.isCorrect
+                                                        ? 'bg-success bg-opacity-25'
+                                                        : 'bg-danger bg-opacity-25'
+                                                    : 'bg-transparent'
                                                     }`}>
                                                 <div className="form-check">
                                                     <input
